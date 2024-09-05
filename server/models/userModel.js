@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    lasstName: {
+    lastName: {
       type: String,
       required: true,
     },
@@ -20,8 +20,8 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
     },
+    profilePic: { type: String, default: null },
     role: {
       type: String,
       enum: ["admin", "user"],
@@ -36,20 +36,6 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-userSchema.methods.generateOtp = function () {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
-  this.otp = otp;
-  this.otpExpiresAt = Date.now() + 10 * 60 * 1000; // Expires in 10 minutes
-  return otp;
-};
-
-userSchema.methods.validateOtp = function (enteredOtp) {
-  if (this.otpExpiresAt < Date.now()) {
-    return false; // OTP expired
-  }
-  return this.otp === enteredOtp;
-};
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

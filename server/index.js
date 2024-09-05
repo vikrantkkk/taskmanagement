@@ -1,12 +1,12 @@
 const express = require("express");
-const dotenv = require("dotenv");
+require("dotenv").config();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const reposeHandler = require("./services/responseHandler/send");
+const userRoute = require("./routes/userRoute");
 const app = express();
-dotenv.config();
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -21,6 +21,8 @@ mongoose
   .connect(MONGO_URI)
   .then(() => console.log(`mongodb is connected..🚀`))
   .catch((err) => console.log(err));
+
+app.use("/api/v1/user", userRoute);
 
 app.use((req, res) => {
   console.log("Route not found...");
