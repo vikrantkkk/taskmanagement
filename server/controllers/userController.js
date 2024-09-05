@@ -277,3 +277,108 @@ exports.changePassword = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.BadRequest({}, "Email is required");
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.NotFound({}, "User not found");
+    }
+
+    // Generate OTP and expiration time
+    const otp = generateOtp();
+    const otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+
+    // Save OTP and expiration to the user object
+    user.otp = otp;
+    user.otpExpiresAt = otpExpiresAt;
+    await user.save();
+
+    // Send OTP via email
+    const payload = {
+      email: user.email,
+      otp,
+      cc: ["vikrantk122896@gmail.com"], // Adjust CC as per your needs
+    };
+    await mailPayload("otp_verification", payload);
+
+    return res.Ok({}, "OTP sent to your email. Please check your inbox.");
+  } catch (error) {
+    console.log(error.message);
+    res.InternalError({}, "Internal server error");
+  }
+};
+
+// Verify OTP and reset password controller
+exports.resetPassword = async (req, res) => {
+  try {
+    const { otp, newPassword } = req.body;
+
+    if (!(otp && newPassword)) {
+      return res.BadRequest({}, "OTP and new password are required");
+    }
+
+    // Find the user by OTP
+    const user = await User.findOne({ otp });
+
+    if (!user) {
+      return res.BadRequest({}, "Invalid OTP");
+    }
+
+    // Check if OTP has expired
+    if (user.otpExpiresAt < Date.now()) {
+      return res.BadRequest({}, "OTP has expired");
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password and clear OTP fields
+    user.password = hashedPassword;
+    user.otp = null;
+    user.otpExpiresAt = null;
+    await user.save();
+
+    let payload = {
+      email: user.email,
+    };
+    await mailPayload("password_reset_confirmation", payload);
+
+    return res.Ok(user, "Password has been reset successfully");
+  } catch (error) {
+    console.log(error.message);
+    res.InternalError({}, "Internal server error");
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.NotFound({}, "User not found");
+    }
+
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+
+    let payload = {
+      email: user.email,
+    };
+    await mailPayload("account_delete", payload);
+
+    return res.Ok(user, "User deleted successfully");
+  } catch (error) {
+    console.log(error.message);
+    res.InternalError({}, "Internal server error");
+  }
+};

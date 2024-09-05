@@ -11,30 +11,10 @@ const emailFooter = `
     <p style="margin: 5px 0 0 0;">123 Task Street, Productivity City, TaskLand</p>
   </div>`;
 
-  const forgotPasswordEmail = ({ otp, resetToken }) => {
-    return {
-      subject: "Password Reset Request - TaskPro Manager",
-      html: `
-        ${emailHeader}
-        <div style="padding: 20px;">
-          <p>Hello,</p>
-          <p>We received a request to reset your password. Use the following OTP to proceed with resetting your password:</p>
-          <p><strong>OTP: ${otp}</strong></p>
-          <p>If you prefer, you can also use the reset token:</p>
-          <p><strong>Reset Token: ${resetToken}</strong></p>
-          <p>This OTP and token will expire in 10 minutes.</p>
-          <p>If you did not request a password reset, please ignore this email.</p>
-        </div>
-        ${emailFooter}
-      `,
-    };
-  };
-  
-
-  const congratulationEmail = ({ email }) => {
-    return {
-      subject: "Welcome to TaskPro Manager!",
-      html: `
+const congratulationEmail = ({ email }) => {
+  return {
+    subject: "Welcome to TaskPro Manager!",
+    html: `
         ${emailHeader}
         <div style="padding: 20px;">
           <p>Hello, ${email}!</p>
@@ -45,14 +25,13 @@ const emailFooter = `
         </div>
         ${emailFooter}
       `,
-    };
   };
-  
+};
 
-  const otpEmail = ({ email, otp }) => {
-    return {
-      subject: "Your OTP for TaskPro Manager",
-      html: `
+const otpEmail = ({ email, otp }) => {
+  return {
+    subject: "Your OTP for TaskPro Manager",
+    html: `
         ${emailHeader}
         <div style="padding: 20px;">
           <p>Hello, ${email}!</p>
@@ -63,13 +42,13 @@ const emailFooter = `
         </div>
         ${emailFooter}
       `,
-    };
   };
+};
 
-  const profileUpdateEmail = ({ email, firstName, lastName, phone }) => {
-    return {
-      subject: "Profile Updated Successfully - TaskPro Manager",
-      html: `
+const profileUpdateEmail = ({ email, firstName, lastName, phone }) => {
+  return {
+    subject: "Profile Updated Successfully - TaskPro Manager",
+    html: `
         ${emailHeader}
         <div style="padding: 20px;">
           <p>Hello, ${firstName} ${lastName}!</p>
@@ -84,13 +63,13 @@ const emailFooter = `
         </div>
         ${emailFooter}
       `,
-    };
   };
-  
-  const changePasswordEmail = ({ email }) => {
-    return {
-      subject: "Your Password Has Been Changed - TaskPro Manager",
-      html: `
+};
+
+const changePasswordEmail = ({ email }) => {
+  return {
+    subject: "Your Password Has Been Changed - TaskPro Manager",
+    html: `
         ${emailHeader}
         <div style="padding: 20px;">
           <p>Hello,</p>
@@ -101,15 +80,45 @@ const emailFooter = `
         </div>
         ${emailFooter}
       `,
-    };
   };
-  
-  
+};
+
+const passwordResetConfirmationEmail = ({ email }) => {
+  return {
+    subject: "Password Reset Confirmation - TaskPro Manager",
+    html: `
+      ${emailHeader}
+      <div style="padding: 20px;">
+        <p>Hello, ${email}!</p>
+        <p>Your password has been successfully reset. You can now log in with your new password.</p>
+        <p>If you did not initiate this request, please contact our support team immediately.</p>
+      </div>
+      ${emailFooter}
+    `,
+  };
+};
+
+const accountDeletionEmail = ({ email }) => {
+  return {
+    subject: "Account Deletion Confirmation - TaskPro Manager",
+    html: `
+      ${emailHeader}
+      <div style="padding: 20px;">
+        <p>Hello, ${email}!</p>
+        <p>We want to let you know that your account has been successfully deleted from TaskPro Manager.</p>
+        <p>If you believe this action was taken in error or if you have any questions, please reach out to our support team at support@taskpromanager.com.</p>
+        <p>Thank you for using TaskPro Manager.</p>
+      </div>
+      ${emailFooter}
+    `,
+  };
+};
 
 module.exports = {
-  forgotPasswordEmail,
   congratulationEmail,
   otpEmail,
   profileUpdateEmail,
-  changePasswordEmail
+  changePasswordEmail,
+  passwordResetConfirmationEmail,
+  accountDeletionEmail
 };

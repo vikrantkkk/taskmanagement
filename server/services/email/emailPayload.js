@@ -19,6 +19,12 @@ module.exports.mailPayload = (template_id, payload) => {
     case "change_password":
       template = EmailTemplate.changePasswordEmail(payload);
       break;
+    case "password_reset_confirmation":
+      template = EmailTemplate.passwordResetConfirmationEmail(payload);
+      break;
+    case "account_delete":
+      template = EmailTemplate.accountDeletionEmail(payload);
+      break;
     default:
       console.log("default Case");
       break;
