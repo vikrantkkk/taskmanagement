@@ -6,12 +6,14 @@ const conflict = require("../responseHandler/conflict");
 const ok = require("../responseHandler/ok");
 const create = require("../responseHandler/create");
 const notFound = require("./notFound");
+const forbidden = require("./forbidden")
 
 module.exports = (req, res, next) => {
   res["Ok"] = ok;
-  res["create"] = create;
+  res["Create"] = create;
   res["BadRequest"] = badRequest;
   res["DbError"] = dbError;
+  res["ForBidden"] = forbidden;
   res["InternalError"] = internalError;
   res["UnAuthorized"] = unAuthorized;
   res["Conflict"] = conflict;

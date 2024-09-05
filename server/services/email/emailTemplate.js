@@ -65,10 +65,51 @@ const emailFooter = `
       `,
     };
   };
+
+  const profileUpdateEmail = ({ email, firstName, lastName, phone }) => {
+    return {
+      subject: "Profile Updated Successfully - TaskPro Manager",
+      html: `
+        ${emailHeader}
+        <div style="padding: 20px;">
+          <p>Hello, ${firstName} ${lastName}!</p>
+          <p>Your profile has been updated successfully on TaskPro Manager. Below are your updated details:</p>
+          <ul>
+            <li><strong>First Name:</strong> ${firstName}</li>
+            <li><strong>Last Name:</strong> ${lastName}</li>
+            <li><strong>Phone:</strong> ${phone}</li>
+            <li><strong>Email:</strong> ${email}</li>
+          </ul>
+          <p>If you did not initiate this update, please contact our support team immediately.</p>
+        </div>
+        ${emailFooter}
+      `,
+    };
+  };
+  
+  const changePasswordEmail = ({ email }) => {
+    return {
+      subject: "Your Password Has Been Changed - TaskPro Manager",
+      html: `
+        ${emailHeader}
+        <div style="padding: 20px;">
+          <p>Hello,</p>
+          <p>We want to inform you that the password for your TaskPro Manager account associated with the email <strong>${email}</strong> has been changed successfully.</p>
+          <p>If you did not initiate this change, please contact our support team immediately to secure your account.</p>
+          <p>If you requested this password change, no further action is needed.</p>
+          <p>For security purposes, we recommend using a strong password and enabling two-factor authentication (if available).</p>
+        </div>
+        ${emailFooter}
+      `,
+    };
+  };
+  
   
 
 module.exports = {
   forgotPasswordEmail,
   congratulationEmail,
   otpEmail,
+  profileUpdateEmail,
+  changePasswordEmail
 };

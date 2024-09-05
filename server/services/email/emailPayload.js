@@ -13,6 +13,12 @@ module.exports.mailPayload = (template_id, payload) => {
     case "otp_verification":
       template = EmailTemplate.otpEmail(payload);
       break;
+    case "profile_update":
+      template = EmailTemplate.profileUpdateEmail(payload);
+      break;
+    case "change_password":
+      template = EmailTemplate.changePasswordEmail(payload);
+      break;
     default:
       console.log("default Case");
       break;
