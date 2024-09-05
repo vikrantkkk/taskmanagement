@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const { mailPayload } = require("../services/email/emailPayload");
 const { generateOtp } = require("../services/utils/otpGenerator");
 const uploadOnCloudinary = require("../services/utils/cloudinaryConfig");
+const cookie = require("cookie");
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^\d{10}$/;
@@ -25,7 +26,6 @@ exports.registerUser = async (req, res) => {
       return res.BadRequest({}, "invalid password format");
     }
     const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
-    console.log("🚀 ~ exports.registerUser= ~ existingUser:", existingUser)
 
     if (existingUser) {
       return res.BadRequest({}, "User already exists");
@@ -37,14 +37,12 @@ exports.registerUser = async (req, res) => {
     const otpExpiresAt = Date.now() + 10 * 60 * 1000;
 
     const imageLocalPath = req.file?.path;
-    console.log("🚀 ~ exports.registerUser= ~ imageLocalPath:", imageLocalPath)
 
     if (!imageLocalPath) {
       return res.BadRequest({}, "Please upload a profile picture");
     }
 
     const images = await uploadOnCloudinary(imageLocalPath);
-    console.log("🚀 ~ exports.registerUser= ~ images:", images)
 
     if (!images.url) {
       return res.BadRequest({}, "Failed to upload image");
@@ -72,7 +70,6 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1d",
       }
     );
-    const createUserData = JSON.parse(JSON.stringify(newUser));
 
     let payload = {
       email,
@@ -81,12 +78,46 @@ exports.registerUser = async (req, res) => {
     };
     await mailPayload("otp_verification", payload);
 
+    res.cookie("token", token, { httpOnly: true });
+
     return res.create(
-      { ...createUserData, token },
-      "user Register successfully"
+      newUser,
+      "User registered successfully. Please verify OTP."
     );
   } catch (error) {
     console.log(error.message);
+    res.InternalError({}, "Internal server error");
+  }
+};
+
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const { userId } = req.user;
+    if (!otp) {
+      return res.BadRequest({}, "OTP is required");
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.NotFound({}, "User not found");
+    }
+    if (user.otp !== otp) {
+      return res.BadRequest({}, "Invalid OTP");
+    }
+
+    if (user.otpExpiresAt < Date.now()) {
+      return res.BadRequest({}, "OTP has expired");
+    }
+
+    user.isVerified = true;
+    // Clear OTP after successful verification
+    user.otp = null;
+    user.otpExpiresAt = null;
+    await user.save();
+
+    return res.Ok(user, "OTP verified successfully. User is now active.");
+  } catch (error) {
+    console.log(error);
     res.InternalError({}, "Internal server error");
   }
 };
