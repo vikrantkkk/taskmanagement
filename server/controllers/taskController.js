@@ -22,6 +22,14 @@ exports.createTask = async (req, res) => {
       owner: req.user.userId,
       assignedTo: assignedTo || null,
     });
+
+    const notification = {
+      userId: assignedTo,
+      message: `New task assigned: ${title}`,
+      taskId: newTask._id,
+    };
+    io.to(assignedTo).emit("receiveNotification", notification);
+
     return res.Create(newTask, "Task created successfully");
   } catch (error) {
     console.log(error);
@@ -58,7 +66,7 @@ exports.updateTask = async (req, res) => {
     if (!task) {
       return res.NotFound({}, "Task not found");
     }
-    
+
     if (
       task.owner.toString() !== req.user.userId &&
       task.assignedTo.toString() !== req.user.userId
@@ -81,6 +89,15 @@ exports.updateTask = async (req, res) => {
     )
       .populate("owner", "firstName lastName")
       .populate("assignedTo", "firstName lastName");
+
+    if (assignedTo && assignedTo !== task.assignedTo.toString()) {
+      const notification = {
+        userId: assignedTo,
+        message: `You have been assigned a new task: ${title}`,
+        taskId: updatedTask._id,
+      };
+      io.to(assignedTo).emit("receiveNotification", notification);
+    }
 
     res.Ok(updatedTask, "Task updated successfully");
   } catch (error) {
@@ -106,6 +123,15 @@ exports.deleteTask = async (req, res) => {
     }
 
     await Task.findByIdAndDelete(taskId);
+
+    if (task.assignedTo) {
+      const notification = {
+        userId: task.assignedTo,
+        message: `A task assigned to you has been deleted: ${task.title}`,
+        taskId: task._id,
+      };
+      io.to(task.assignedTo).emit("receiveNotification", notification);
+    }
 
     return res.Ok(task, "Task deleted successfully");
   } catch (error) {
