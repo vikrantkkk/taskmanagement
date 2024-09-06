@@ -27,8 +27,6 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
-    teams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Team" }],
-    projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }],
     googleId: { type: String }, // For Google authentication
     isVerified: { type: Boolean, default: false }, // OTP verification status
     otp: { type: String }, // OTP code
