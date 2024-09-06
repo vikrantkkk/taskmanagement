@@ -6,6 +6,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const reposeHandler = require("./services/responseHandler/send");
 const userRoute = require("./routes/userRoute");
+const taskRoute = require("./routes/taskRoute");
 const app = express();
 
 app.use(express.json());
@@ -24,6 +25,7 @@ mongoose
   .catch((err) => console.log(err));
 
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/task", taskRoute);
 
 app.use((req, res) => {
   console.log("Route not found...");

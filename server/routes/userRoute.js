@@ -18,7 +18,7 @@ const router = express.Router();
 
 router.post("/register", upload.single("images"), registerUser);
 router.post("/verify-otp", authMiddleware, verifyOtp);
-router.post("/login", authMiddleware, loginUser);
+router.post("/login", loginUser);
 router.get("/get-user-profile", authMiddleware, getUserProfile);
 router.put(
   "/update-user-profile",

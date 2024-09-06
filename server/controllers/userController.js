@@ -63,7 +63,7 @@ exports.registerUser = async (req, res) => {
     const token = jwt.sign(
       {
         userId: newUser._id,
-        role: "user",
+        role: newUser.role,
         email: email,
       },
       process.env.JWT_SECRET,
@@ -161,7 +161,7 @@ exports.loginUser = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, role: "user", email },
+      { userId: user._id, role: user.role, email },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -186,7 +186,8 @@ exports.loginUser = async (req, res) => {
 
 exports.getUserProfile = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const  {userId} = req.user;
+    console.log("🚀 ~ exports.getUserProfile= ~ userId:", userId)
     const user = await User.findById(userId).select("-password");
 
     if (!user) {
