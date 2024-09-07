@@ -7,26 +7,22 @@ const uploadOnCloudinary = require("../services/utils/cloudinaryConfig");
 const cookie = require("cookie");
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const phoneRegex = /^\d{10}$/;
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
 exports.registerUser = async (req, res) => {
   try {
-    const { firstName, lastName, phone, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!(firstName && lastName && phone && email && password)) {
+    if (!(name && email && password)) {
       return res.BadRequest({}, "missing required fields");
     }
     if (!emailRegex.test(email)) {
       return res.BadRequest({}, "invalid email format");
     }
-    if (!phoneRegex.test(phone)) {
-      return res.BadRequest({}, "invalid phone number format");
-    }
     if (!passwordRegex.test(password)) {
       return res.BadRequest({}, "invalid password format");
     }
-    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+    const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       return res.BadRequest({}, "User already exists");
@@ -39,23 +35,23 @@ exports.registerUser = async (req, res) => {
 
     const imageLocalPath = req.file?.path;
 
-    if (!imageLocalPath) {
-      return res.BadRequest({}, "Please upload a profile picture");
-    }
+    let imageUrl = null;
 
-    const images = await uploadOnCloudinary(imageLocalPath);
+    if (imageLocalPath) {
+      const images = await uploadOnCloudinary(imageLocalPath);
 
-    if (!images.url) {
-      return res.BadRequest({}, "Failed to upload image");
+      if (!images.url) {
+        return res.BadRequest({}, "Failed to upload image");
+      }
+
+      imageUrl = images.url;
     }
 
     const newUser = await User.create({
-      firstName,
-      lastName,
-      phone,
+      name,
       email,
       password: hashedPassword,
-      profilePic: images.url,
+      profilePic: imageUrl,
       otp,
       otpExpiresAt,
     });
@@ -72,7 +68,11 @@ exports.registerUser = async (req, res) => {
       }
     );
 
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+    });
 
     let payload = {
       email,
@@ -167,7 +167,11 @@ exports.loginUser = async (req, res) => {
     );
 
     // Set the token in a cookie
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+    });
 
     // Send OTP to user's email
     const payload = {
@@ -186,8 +190,7 @@ exports.loginUser = async (req, res) => {
 
 exports.getUserProfile = async (req, res) => {
   try {
-    const  {userId} = req.user;
-    console.log("🚀 ~ exports.getUserProfile= ~ userId:", userId)
+    const { userId } = req.user;
     const user = await User.findById(userId).select("-password");
 
     if (!user) {
@@ -204,23 +207,25 @@ exports.getUserProfile = async (req, res) => {
 exports.updateUserProfile = async (req, res) => {
   try {
     const { userId } = req.user;
-    const { firstName, lastName, phone, email } = req.body;
+    const { name, email } = req.body;
 
     const imageLocalPath = req.file?.path;
 
-    if (!imageLocalPath) {
-      return res.BadRequest({}, "Please upload a profile picture");
-    }
+    let imageUrl = null;
 
-    const images = await uploadOnCloudinary(imageLocalPath);
+    if (imageLocalPath) {
+      const images = await uploadOnCloudinary(imageLocalPath);
 
-    if (!images.url) {
-      return res.BadRequest({}, "Failed to upload image");
+      if (!images.url) {
+        return res.BadRequest({}, "Failed to upload image");
+      }
+
+      imageUrl = images.url;
     }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { firstName, lastName, phone, email, profilePic: images.url },
+      { name, email, profilePic: imageUrl },
       { new: true }
     ).select("-password");
 
@@ -229,9 +234,7 @@ exports.updateUserProfile = async (req, res) => {
     }
 
     const payload = {
-      firstName,
-      lastName,
-      phone,
+      name,
       email,
       cc: ["vikrantk122896@gmail.com"],
     };

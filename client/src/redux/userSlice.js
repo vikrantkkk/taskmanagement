@@ -1,18 +1,24 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState: {
     user: null,
     token: null,
     isLoggedIn: false,
+    message: "",
+    timestamp: null,
   },
   reducers: {
     // Action to log in and set user and token
     login: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.isLoggedIn = true;
+      const { data, message, success, timestamp } = action.payload;
+      console.log("🚀 ~ data:", data)
+      state.user = data;  // Store the user data
+      state.token = data.token; // Assuming token is in data object
+      state.isLoggedIn = success;
+      state.message = message;
+      state.timestamp = timestamp;
     },
     // Action to clear user and token (logout)
     logout: (state) => {

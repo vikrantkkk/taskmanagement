@@ -45,18 +45,16 @@ const otpEmail = ({ email, otp }) => {
   };
 };
 
-const profileUpdateEmail = ({ email, firstName, lastName, phone }) => {
+const profileUpdateEmail = ({ email,name }) => {
   return {
     subject: "Profile Updated Successfully - TaskPro Manager",
     html: `
         ${emailHeader}
         <div style="padding: 20px;">
-          <p>Hello, ${firstName} ${lastName}!</p>
+          <p>Hello, ${name}!</p>
           <p>Your profile has been updated successfully on TaskPro Manager. Below are your updated details:</p>
           <ul>
-            <li><strong>First Name:</strong> ${firstName}</li>
-            <li><strong>Last Name:</strong> ${lastName}</li>
-            <li><strong>Phone:</strong> ${phone}</li>
+            <li><strong>First Name:</strong> ${name}</li>
             <li><strong>Email:</strong> ${email}</li>
           </ul>
           <p>If you did not initiate this update, please contact our support team immediately.</p>

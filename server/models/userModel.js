@@ -1,17 +1,9 @@
 const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema(
   {
-    firstName: {
+    name: {
       type: String,
       required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    phone: {
-      type: String,
-      unique: true,
     },
     email: {
       type: String,
@@ -27,7 +19,6 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
-    googleId: { type: String }, // For Google authentication
     isVerified: { type: Boolean, default: false }, // OTP verification status
     otp: { type: String }, // OTP code
     otpExpiresAt: { type: Date }, // OTP expiration time
