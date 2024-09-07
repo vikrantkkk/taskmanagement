@@ -1,9 +1,19 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, IconButton, InputAdornment } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useLoginMutation } from "../redux/api/authApi";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/authSlice";
+
 
 // Define Yup schema for login
 const loginSchema = yup.object().shape({
@@ -11,11 +21,17 @@ const loginSchema = yup.object().shape({
     .string()
     .email("Invalid email format")
     .required("Email is required"),
-  password: yup.string().required("Password is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
 });
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+
+  const dispatch = useDispatch();
+  const [loginMutation, { isLoading, isError, error }] = useLoginMutation();
 
   const methods = useForm({
     resolver: yupResolver(loginSchema),
@@ -32,9 +48,15 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  const onSubmit = (data) => {
-    console.log("Login data:", data);
-    // Perform login logic here
+  const onSubmit = async (data) => {
+    try {
+      const response = await loginMutation(data).unwrap();
+      dispatch(login(response)); // Save user info and token to the store
+      console.log("Login successful:", response);
+      // Redirect or perform further actions here
+    } catch (err) {
+      console.error("Login failed:", err);
+    }
   };
 
   return (
@@ -67,10 +89,7 @@ const Login = () => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton
-                    onClick={handleClickShowPassword}
-                    edge="end"
-                  >
+                  <IconButton onClick={handleClickShowPassword} edge="end">
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
