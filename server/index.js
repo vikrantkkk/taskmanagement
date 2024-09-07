@@ -16,12 +16,12 @@ const io = socketIo(server);
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
-  
+
   // Handle incoming notifications
   socket.on("sendNotification", (notification) => {
     io.to(notification.userId).emit("receiveNotification", notification);
   });
-  
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
@@ -29,10 +29,14 @@ io.on("connection", (socket) => {
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(morgan("dev"));
 app.use(reposeHandler);
-
 
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;

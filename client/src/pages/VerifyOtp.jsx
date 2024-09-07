@@ -4,17 +4,11 @@ import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import EmailIcon from "@mui/icons-material/Email";
-import { useSelector } from "react-redux";
-import { useVerifyOtpMutation } from "../redux/api/userApi";
+import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
-
-// Utility function to get a specific cookie value
-const getCookie = (name) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-};
+import { useVerifyOtpMutation } from "../redux/api/userApi";
+import { verifyOtp } from "../redux/userSlice";
 
 // Validation schema
 const otpSchema = yup.object().shape({
@@ -30,7 +24,11 @@ const VerifyOtp = () => {
   const inputsRef = useRef([]);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { email } = useSelector((state) => state.auth.user);
+
+  // RTK Query hook for OTP verification
+  const [verifyOtpMutation] = useVerifyOtpMutation();
 
   const { handleSubmit, control, setValue, formState } = useForm({
     resolver: yupResolver(otpSchema),
@@ -57,19 +55,17 @@ const VerifyOtp = () => {
     }
   };
 
-  const [verifyOtpMutation, { isLoading }] = useVerifyOtpMutation();
-
   const onSubmit = async (data) => {
     try {
-      const token = getCookie('token');
-      console.log("🚀 ~ onSubmit ~ token:", token)
-      const response = await verifyOtpMutation({ otp: data.otp, token }).unwrap();
+      const response = await verifyOtpMutation({ otp: data.otp }).unwrap();
       enqueueSnackbar(response?.message, { variant: "success" });
+      dispatch(verifyOtp(response));
       if (response?.success) {
         navigate("/dashboard");
       }
     } catch (err) {
-      enqueueSnackbar("Invalid OTP. Please try again.", { variant: "error" });
+      console.error("Invalid otp:", err);
+      enqueueSnackbar("Invalid otp.", { variant: "error" });
     }
   };
 
@@ -126,13 +122,13 @@ const VerifyOtp = () => {
                     borderColor: "#673AB7",
                     "& .MuiOutlinedInput-root": {
                       "& fieldset": {
-                        borderColor: "#673AB7", // Border color when not focused
+                        borderColor: "#673AB7",
                       },
                       "&:hover fieldset": {
-                        borderColor: "#5e35b1", // Border color on hover
+                        borderColor: "#5e35b1",
                       },
                       "&.Mui-focused fieldset": {
-                        borderColor: "#673AB7", // Border color when focused
+                        borderColor: "#673AB7",
                       },
                     },
                   }}
@@ -159,7 +155,7 @@ const VerifyOtp = () => {
               color: "#673AB7",
               "&:hover": { borderColor: "#673AB7", backgroundColor: "#EDE7F6" },
             }}
-            onClick={() => navigate('/login')} // Redirect to login page if needed
+            onClick={() => navigate("/login")}
           >
             Cancel
           </Button>
@@ -173,7 +169,7 @@ const VerifyOtp = () => {
               "&:hover": { backgroundColor: "#5e35b1" },
             }}
           >
-            {isLoading ? "Verifying..." : "Verify OTP"}
+            Verify OTP
           </Button>
         </Box>
       </Box>

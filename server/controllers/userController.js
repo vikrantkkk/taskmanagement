@@ -80,9 +80,9 @@ exports.registerUser = async (req, res) => {
       cc: ["vikrantk122896@gmail.com.com"],
     };
     await mailPayload("otp_verification", payload);
-
+    const createUserData = JSON.parse(JSON.stringify(newUser));
     return res.Create(
-      newUser,
+      { ...createUserData, token },
       "User registered successfully. Please verify OTP."
     );
   } catch (error) {
@@ -123,7 +123,7 @@ exports.verifyOtp = async (req, res) => {
     user.otpExpiresAt = null;
     await user.save();
 
-    return res.Ok(user, "OTP verified successfully. User is now active.");
+    return res.Ok({ user }, "OTP verified successfully. User is now active.");
   } catch (error) {
     console.log(error);
     res.InternalError({}, "Internal server error");
@@ -166,11 +166,11 @@ exports.loginUser = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    // Set the token in a cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
+      secure: false, // Set to true in production when using HTTPS
+      sameSite: "Strict", // Allows cookies to be sent across different ports
+      maxAge: 24 * 60 * 60 * 1000, // Cookie expiration time (1 day)
     });
 
     // Send OTP to user's email
@@ -180,8 +180,11 @@ exports.loginUser = async (req, res) => {
       cc: ["vikrantk122896@gmail.com"],
     };
     await mailPayload("otp_verification", payload);
-
-    return res.Ok(user, "Login successful. OTP sent to your email.");
+    const loginUserData = JSON.parse(JSON.stringify(user));
+    return res.Ok(
+      { ...loginUserData, token },
+      "Login successful. OTP sent to your email."
+    );
   } catch (error) {
     console.log(error);
     return res.InternalError({}, "Internal server error");

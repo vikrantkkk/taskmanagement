@@ -55,7 +55,6 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       const response = await loginMutation(data).unwrap();
-      console.log("🚀 ~ onSubmit ~ response:", response);
       enqueueSnackbar(response?.message, { variant: "success" });
       // Save user info and token to the store
       dispatch(login(response));

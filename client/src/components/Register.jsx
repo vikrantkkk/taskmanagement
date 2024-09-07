@@ -1,13 +1,24 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, IconButton, InputAdornment } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useRegisterMutation } from "../redux/api/userApi";
+import { register } from "../redux/userSlice";
+import { useSnackbar } from "notistack";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 // Define Yup schema for registration
 const registerSchema = yup.object().shape({
-  firstName: yup.string().required("First name is required"),
+  name: yup.string().required("Name is required"),
   email: yup
     .string()
     .email("Invalid email format")
@@ -25,11 +36,16 @@ const registerSchema = yup.object().shape({
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [registerMutation, { isLoading }] = useRegisterMutation();
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
 
   const methods = useForm({
     resolver: yupResolver(registerSchema),
     defaultValues: {
-      firstName: "",
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -46,9 +62,19 @@ const Register = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const onSubmit = (data) => {
-    console.log("Register data:", data);
-    // Perform registration logic here
+  const onSubmit = async (data) => {
+    const { confirmPassword, ...payload } = data; // Exclude confirmPassword from the payload
+    try {
+      const response = await registerMutation(payload).unwrap();
+      enqueueSnackbar(response?.message, { variant: "success" });
+      // Save user info and token to the store
+      dispatch(register(response));
+      if (response?.success) {
+        navigate("/verifyotp");
+      }
+    } catch (error) {
+      setError(error.message || "Registration failed");
+    }
   };
 
   return (
@@ -58,14 +84,14 @@ const Register = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-md mx-auto p-4 bg-white rounded-lg shadow-lg relative"
       >
-        {/* First Name Field */}
+        {/* Name Field */}
         <Box mb={2}>
           <TextField
-            label="First Name"
+            label="Name"
             fullWidth
-            {...methods.register("firstName")}
-            error={Boolean(methods.formState.errors.firstName)}
-            helperText={methods.formState.errors.firstName?.message}
+            {...methods.register("name")}
+            error={Boolean(methods.formState.errors.name)}
+            helperText={methods.formState.errors.name?.message}
             sx={{
               "& .MuiInputLabel-root": {
                 color: "#673AB7", // Label color
@@ -124,10 +150,7 @@ const Register = () => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton
-                    onClick={handleClickShowPassword}
-                    edge="end"
-                  >
+                  <IconButton onClick={handleClickShowPassword} edge="end">
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
@@ -204,9 +227,17 @@ const Register = () => {
               backgroundColor: "#5e35b1", // Hover color
             },
           }}
+          disabled={isLoading} // Disable button when loading
         >
-          Sign Up
+          {isLoading ? "Signing Up..." : "Sign Up"}
         </Button>
+
+        {/* Error Message Display */}
+        {error && (
+          <Box mt={2}>
+            <p className="text-red-500 text-center">{error}</p>
+          </Box>
+        )}
       </Box>
     </FormProvider>
   );

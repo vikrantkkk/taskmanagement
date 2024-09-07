@@ -10,15 +10,24 @@ const authSlice = createSlice({
     timestamp: null,
   },
   reducers: {
-    // Action to log in and set user and token
-    login: (state, action) => {
+    register: (state, action) => {
       const { data, message, success, timestamp } = action.payload;
-      console.log("🚀 ~ data:", data)
-      state.user = data;  // Store the user data
-      state.token = data.token; // Assuming token is in data object
+      state.user = data; // Store the user data
       state.isLoggedIn = success;
       state.message = message;
       state.timestamp = timestamp;
+    },
+    // Action to log in and set user and token
+    login: (state, action) => {
+      const { data, message ,success, timestamp } = action.payload;
+      state.user = data; // Store the user data
+      state.isLoggedIn = success;
+      state.message = message;
+      state.timestamp = timestamp;
+    },
+    verifyOtp: (state, action) => {
+      const { data } = action.payload;
+      state.user = data;
     },
     // Action to clear user and token (logout)
     logout: (state) => {
@@ -30,7 +39,7 @@ const authSlice = createSlice({
 });
 
 // Export actions for components to use
-export const { login, logout } = authSlice.actions;
+export const { register, login, verifyOtp, logout } = authSlice.actions;
 
 // Export reducer to be added to the store
 export default authSlice.reducer;
