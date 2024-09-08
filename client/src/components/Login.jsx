@@ -105,22 +105,6 @@ const Login = () => {
             error={Boolean(methods.formState.errors.email)}
             helperText={methods.formState.errors.email?.message}
             disabled={isLoading}
-            sx={{
-              "& .MuiInputLabel-root": {
-                color: "#673AB7", // Label color
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#673AB7", // Border color when not focused
-                },
-                "&:hover fieldset": {
-                  borderColor: "#5e35b1", // Border color on hover
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#673AB7", // Border color when focused
-                },
-              },
-            }}
           />
         </Box>
 
@@ -143,22 +127,6 @@ const Login = () => {
               ),
             }}
             disabled={isLoading}
-            sx={{
-              "& .MuiInputLabel-root": {
-                color: "#673AB7", // Label color
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#673AB7", // Border color when not focused
-                },
-                "&:hover fieldset": {
-                  borderColor: "#5e35b1", // Border color on hover
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#673AB7", // Border color when focused
-                },
-              },
-            }}
           />
         </Box>
 

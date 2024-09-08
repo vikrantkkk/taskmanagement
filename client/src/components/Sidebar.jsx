@@ -16,7 +16,7 @@ const Sidebar = () => {
           {/* Task-related links */}
           <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
             <ListAlt />
-            <Link to="/tasks" className="text-white">All Tasks</Link>
+            <Link to="/dashboard/tasks" className="text-white">All Tasks</Link>
           </li>
           <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
             <HourglassEmpty />

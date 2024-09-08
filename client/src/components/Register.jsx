@@ -92,22 +92,6 @@ const Register = () => {
             {...methods.register("name")}
             error={Boolean(methods.formState.errors.name)}
             helperText={methods.formState.errors.name?.message}
-            sx={{
-              "& .MuiInputLabel-root": {
-                color: "#673AB7", // Label color
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#673AB7", // Border color when not focused
-                },
-                "&:hover fieldset": {
-                  borderColor: "#5e35b1", // Border color on hover
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#673AB7", // Border color when focused
-                },
-              },
-            }}
           />
         </Box>
 
@@ -119,22 +103,6 @@ const Register = () => {
             {...methods.register("email")}
             error={Boolean(methods.formState.errors.email)}
             helperText={methods.formState.errors.email?.message}
-            sx={{
-              "& .MuiInputLabel-root": {
-                color: "#673AB7", // Label color
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#673AB7", // Border color when not focused
-                },
-                "&:hover fieldset": {
-                  borderColor: "#5e35b1", // Border color on hover
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#673AB7", // Border color when focused
-                },
-              },
-            }}
           />
         </Box>
 
@@ -155,22 +123,6 @@ const Register = () => {
                   </IconButton>
                 </InputAdornment>
               ),
-            }}
-            sx={{
-              "& .MuiInputLabel-root": {
-                color: "#673AB7", // Label color
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#673AB7", // Border color when not focused
-                },
-                "&:hover fieldset": {
-                  borderColor: "#5e35b1", // Border color on hover
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#673AB7", // Border color when focused
-                },
-              },
             }}
           />
         </Box>
@@ -195,22 +147,6 @@ const Register = () => {
                   </IconButton>
                 </InputAdornment>
               ),
-            }}
-            sx={{
-              "& .MuiInputLabel-root": {
-                color: "#673AB7", // Label color
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#673AB7", // Border color when not focused
-                },
-                "&:hover fieldset": {
-                  borderColor: "#5e35b1", // Border color on hover
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#673AB7", // Border color when focused
-                },
-              },
             }}
           />
         </Box>

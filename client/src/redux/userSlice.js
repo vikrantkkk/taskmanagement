@@ -20,6 +20,7 @@ const authSlice = createSlice({
     // Action to log in and set user and token
     login: (state, action) => {
       const { data, message ,success, timestamp } = action.payload;
+      localStorage.setItem("token",data.token)
       state.user = data; // Store the user data
       state.isLoggedIn = success;
       state.message = message;

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Typography } from '@mui/material';
-import TaskList from '../components/TaskList';
 
 const Dashboard = () => {
   return (
@@ -11,7 +10,6 @@ const Dashboard = () => {
       <Typography variant="body1" paragraph>
         Welcome to the dashboard of your task management system!
       </Typography>
-      <TaskList />
     </div>
   );
 };

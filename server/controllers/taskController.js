@@ -1,16 +1,17 @@
 const Task = require("../models/taskModel");
 const User = require("../models/userModel");
+const { sendNotification } = require("../socket");
 
 exports.createTask = async (req, res) => {
   try {
     const { title, description, status, priority, assignedTo } = req.body;
     if (!title) {
-      return res.BadRequest({}, "Title is required");
+      return res.status(400).json({ message: "Title is required" });
     }
     if (assignedTo) {
       const user = await User.findById(assignedTo);
       if (!user) {
-        return res.NotFound({}, "User not found");
+        return res.status(404).json({ message: "User not found" });
       }
     }
 
@@ -23,19 +24,33 @@ exports.createTask = async (req, res) => {
       assignedTo: assignedTo || null,
     });
 
-    const notification = {
-      userId: assignedTo,
-      message: `New task assigned: ${title}`,
+    // Notify the task owner
+    const ownerNotification = {
+      userId: req.user.userId,
+      message: `You have created a new task: ${title}`,
       taskId: newTask._id,
     };
-    io.to(assignedTo).emit("receiveNotification", notification);
+    console.log("Sending owner notification:", ownerNotification);
+    sendNotification(req.user.userId, ownerNotification);
 
-    return res.Create(newTask, "Task created successfully");
+    // Notify the assignee (if assigned)
+    if (assignedTo) {
+      const assigneeNotification = {
+        userId: assignedTo,
+        message: `New task assigned to you: ${title}`,
+        taskId: newTask._id,
+      };
+      console.log("Sending assignee notification:", assigneeNotification);
+      sendNotification(assignedTo, assigneeNotification);
+    }
+
+    return res.status(201).json({ task: newTask, message: "Task created successfully" });
   } catch (error) {
     console.log(error);
-    res.InternalError({}, "Internal server error");
+    res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 exports.getUserTask = async (req, res) => {
   try {

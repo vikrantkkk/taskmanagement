@@ -1,11 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, IconButton, Badge } from "@mui/material";
-import { Notifications, AccountCircle } from "@mui/icons-material"; // Importing icons
+import { Notifications, AccountCircle } from "@mui/icons-material";
 import CreateTaskDialog from "./CreateTaskDialog";
+import NotificationMenu from "./NotificationMenu";
+import io from "socket.io-client"; // Import Socket.io client
 
 const Header = () => {
-  const [openDialog, setOpenDialog] = useState(false); // State to control the dialog
-  const [notificationsCount, setNotificationsCount] = useState(3); // Example notification count
+  const [openDialog, setOpenDialog] = useState(false); // Dialog state
+  const [notifications, setNotifications] = useState([]); // List of notifications
+  const [notificationsCount, setNotificationsCount] = useState(0); // Notification count
+  const [anchorEl, setAnchorEl] = useState(null); // For notification menu
+
+  useEffect(() => {
+    // Connect to Socket.io server
+    const socket = io("http://localhost:3000"); // Ensure this matches your backend URL
+
+    // Listen for incoming notifications from the server
+    socket.on("receiveNotification", (notification) => {
+      console.log("Notification received:", notification); // For debugging
+      setNotifications((prev) => [...prev, notification]);
+      setNotificationsCount((prev) => prev + 1);
+    });
+
+    // Cleanup socket connection
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   // Function to open the dialog
   const handleOpenDialog = () => {
@@ -17,46 +38,65 @@ const Header = () => {
     setOpenDialog(false);
   };
 
+  // Function to handle notification menu opening
+  const handleNotificationClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  // Function to close the notification menu
+  const handleCloseNotificationMenu = () => {
+    setAnchorEl(null);
+  };
+
+  // Mark notification as read
+  const markAsRead = (index) => {
+    const updatedNotifications = [...notifications];
+    updatedNotifications.splice(index, 1);
+    setNotifications(updatedNotifications);
+    setNotificationsCount(updatedNotifications.length);
+    handleCloseNotificationMenu();
+  };
+
   return (
-    <header className="flex items-center justify-between px-8 py-4 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 shadow-lg">
+    <header className="p-4 flex items-center justify-between">
       <h1 className="text-white text-2xl font-bold">Task Manager</h1>
 
       <div className="flex items-center space-x-4">
         {/* Create Task Button */}
         <Button
           variant="contained"
-          onClick={handleOpenDialog} // Trigger opening the dialog
+          onClick={handleOpenDialog}
           sx={{
-            backgroundColor: 'linear-gradient(45deg, #FFA726, #FB8C00)',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'linear-gradient(45deg, #FF9800, #F57C00)',
-              boxShadow: '0 4px 10px rgba(255, 152, 0, 0.7)',
+            backgroundColor: "#673AB7",
+            "&:hover": {
+              backgroundColor: "#5e35b1",
             },
-            textTransform: 'none',
-            padding: '12px 24px',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            borderRadius: '30px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
-            transition: 'all 0.3s ease',
           }}
         >
           Create Task
         </Button>
 
         {/* Notification Icon */}
-        <IconButton sx={{ color: 'white' }}>
+        <IconButton sx={{ color: "gray" }} onClick={handleNotificationClick}>
           <Badge badgeContent={notificationsCount} color="error">
             <Notifications fontSize="large" />
           </Badge>
         </IconButton>
 
         {/* Profile Icon */}
-        <IconButton sx={{ color: 'white' }}>
+        <IconButton sx={{ color: "gray" }}>
           <AccountCircle fontSize="large" />
         </IconButton>
       </div>
+
+      {/* Notification Menu */}
+      <NotificationMenu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleCloseNotificationMenu}
+        notifications={notifications}
+        markAsRead={markAsRead}
+      />
 
       {/* Create Task Dialog */}
       <CreateTaskDialog open={openDialog} handleClose={handleCloseDialog} />

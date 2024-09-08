@@ -115,23 +115,6 @@ const VerifyOtp = () => {
                   inputRef={(ref) => (inputsRef.current[index] = ref)}
                   variant="outlined"
                   inputProps={{ maxLength: 1 }}
-                  sx={{
-                    width: "60px",
-                    textAlign: "center",
-                    borderRadius: "8px",
-                    borderColor: "#673AB7",
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "#673AB7",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "#5e35b1",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#673AB7",
-                      },
-                    },
-                  }}
                 />
               )}
             />

@@ -1,48 +1,60 @@
 import React from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 // Validation schema
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
-  description: yup.string().required("Description is required"),
-  status: yup.string().required("Status is required"),
-  priority: yup.string().required("Priority is required"),
-  assignedTo: yup.string().required("Assigned User is required"),
 });
 
 const CreateTaskDialog = ({ open, handleClose }) => {
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(schema),
   });
 
+  const token = localStorage.getItem("token");
+  console.log("🚀 ~ CreateTaskDialog ~ token:", token)
+
   const onSubmit = async (data) => {
     try {
-      // Your task creation logic here
-      console.log(data);
-      handleClose(); // Close the dialog after successful submission
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/task/create-task`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("🚀 ~ onSubmit ~ response:", response);
+      handleClose();
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth="sm"
-      fullWidth
-      PaperProps={{
-        className: "rounded-lg" // Rounded corners for the dialog box
-      }}
-    >
-      <DialogTitle
-        className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white rounded-t-lg px-6 py-4"
-      >
-        Create New Task
-      </DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle className="px-6 py-4">Create New Task</DialogTitle>
       <DialogContent className="p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           {/* Title */}
@@ -77,39 +89,51 @@ const CreateTaskDialog = ({ open, handleClose }) => {
                 margin="dense"
                 variant="outlined"
                 error={!!errors.description}
-                helperText={errors.description ? errors.description.message : ""}
+                helperText={
+                  errors.description ? errors.description.message : ""
+                }
                 className="mb-4"
               />
             )}
           />
 
           {/* Status */}
-          <FormControl fullWidth margin="dense" variant="outlined" className="mb-4">
+          <FormControl
+            fullWidth
+            margin="dense"
+            variant="outlined"
+            className="mb-4"
+          >
             <InputLabel>Status</InputLabel>
             <Controller
               name="status"
               control={control}
               render={({ field }) => (
                 <Select {...field} label="Status">
-                  <MenuItem value="To Do">To Do</MenuItem>
-                  <MenuItem value="In Progress">In Progress</MenuItem>
-                  <MenuItem value="Completed">Completed</MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
+                  <MenuItem value="inprogress">In Progress</MenuItem>
+                  <MenuItem value="completed">Completed</MenuItem>
                 </Select>
               )}
             />
           </FormControl>
 
           {/* Priority */}
-          <FormControl fullWidth margin="dense" variant="outlined" className="mb-4">
+          <FormControl
+            fullWidth
+            margin="dense"
+            variant="outlined"
+            className="mb-4"
+          >
             <InputLabel>Priority</InputLabel>
             <Controller
               name="priority"
               control={control}
               render={({ field }) => (
                 <Select {...field} label="Priority">
-                  <MenuItem value="Low">Low</MenuItem>
-                  <MenuItem value="Medium">Medium</MenuItem>
-                  <MenuItem value="High">High</MenuItem>
+                  <MenuItem value="low">Low</MenuItem>
+                  <MenuItem value="medium">Medium</MenuItem>
+                  <MenuItem value="high">High</MenuItem>
                 </Select>
               )}
             />
@@ -135,10 +159,28 @@ const CreateTaskDialog = ({ open, handleClose }) => {
         </form>
       </DialogContent>
       <DialogActions className="p-6">
-        <Button onClick={handleClose} color="primary" className="bg-gray-300 hover:bg-gray-400">
+        <Button
+          onClick={handleClose}
+          color="primary"
+          sx={{
+            borderColor: "#673AB7",
+            color: "#673AB7",
+            "&:hover": { borderColor: "#673AB7", backgroundColor: "#EDE7F6" },
+          }}
+        >
           Cancel
         </Button>
-        <Button onClick={handleSubmit(onSubmit)} color="primary" variant="contained" className="bg-blue-500 hover:bg-blue-600">
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          color="primary"
+          variant="contained"
+          sx={{
+            backgroundColor: "#673AB7",
+            "&:hover": {
+              backgroundColor: "#5e35b1", // Hover color
+            },
+          }}
+        >
           Create Task
         </Button>
       </DialogActions>
