@@ -5,14 +5,20 @@ import { Outlet } from "react-router-dom";
 
 const AppLayout = () => {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
+    <div className="flex h-screen">
+      <div className="w-64 bg-gray-800 text-white h-full sticky top-0">
+        <Sidebar />
+      </div>
       <div className="flex-1 flex flex-col">
-        <Header />
-        <div className="flex-1 p-4">
-          <Outlet />
+        <div className="h-16 bg-white shadow-md sticky top-0 z-10">
+          <Header />
         </div>
-        <Footer />
+        <div className="flex-1 flex flex-col overflow-y-auto">
+          <main className="flex-1 p-4">
+            <Outlet />
+          </main>
+          <Footer className="bg-white shadow-md" />
+        </div>
       </div>
     </div>
   );
