@@ -9,6 +9,7 @@ const {
   forgotPassword,
   resetPassword,
   deleteUser,
+  logoutUser,
 } = require("../controllers/userController");
 const { upload } = require("../middlewares/uploadFileMiddleware"); // Make sure this path is correct
 const authMiddleware = require("../middlewares/authMiddleware");
@@ -29,7 +30,12 @@ router.put(
 router.post("/change-password", authMiddleware, changePassword);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
-router.delete("/delete-user/:userId", authMiddleware, authorizeRoles(["admin"]), deleteUser);
-
+router.delete(
+  "/delete-user/:userId",
+  authMiddleware,
+  authorizeRoles(["admin"]),
+  deleteUser
+);
+router.post("/logout", logoutUser);
 
 module.exports = router;

@@ -16,6 +16,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { useSnackbar } from "notistack";
 
 // Validation schema
 const schema = yup.object().shape({
@@ -23,6 +24,8 @@ const schema = yup.object().shape({
 });
 
 const CreateTaskDialog = ({ open, handleClose }) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const {
     control,
     handleSubmit,
@@ -32,7 +35,6 @@ const CreateTaskDialog = ({ open, handleClose }) => {
   });
 
   const token = localStorage.getItem("token");
-  console.log("🚀 ~ CreateTaskDialog ~ token:", token)
 
   const onSubmit = async (data) => {
     try {
@@ -45,7 +47,7 @@ const CreateTaskDialog = ({ open, handleClose }) => {
           },
         }
       );
-      console.log("🚀 ~ onSubmit ~ response:", response);
+      enqueueSnackbar(response?.data?.message, { variant: "success" });
       handleClose();
     } catch (error) {
       console.log(error);

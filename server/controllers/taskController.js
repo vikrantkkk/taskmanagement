@@ -5,12 +5,12 @@ exports.createTask = async (req, res) => {
   try {
     const { title, description, status, priority, assignedTo } = req.body;
     if (!title) {
-      return res.status(400).json({ message: "Title is required" });
+      return res.BadRequest({ message: "Title is required" });
     }
     if (assignedTo) {
       const user = await User.findById(assignedTo);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.NotFound({ message: "User not found" });
       }
     }
 
@@ -22,9 +22,8 @@ exports.createTask = async (req, res) => {
       owner: req.user.userId,
       assignedTo: assignedTo || null,
     });
-    return res
-      .status(201)
-      .json({ task: newTask, message: "Task created successfully" });
+    const newTaskData = JSON.parse(JSON.stringify(newTask));
+    return res.Create(newTaskData, "Task created successfully");
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
@@ -65,7 +64,7 @@ exports.updateTask = async (req, res) => {
       task.owner.toString() !== req.user.userId &&
       task.assignedTo.toString() !== req.user.userId
     ) {
-      return res.Forbidden({}, "You are not authorized to update this task");
+      return res.ForBidden({}, "You are not authorized to update this task");
     }
 
     const updatedTask = await Task.findByIdAndUpdate(

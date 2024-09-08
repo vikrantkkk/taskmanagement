@@ -5,6 +5,9 @@ import AuthPage from "./pages/AuthPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import VerifyOtp from "./pages/VerifyOtp";
 import TaskList from "./components/TaskList";
+import InProgressTaskList from "./pages/InProgressTaskList";
+import CompletedTaskList from "./pages/CompletedTaskList";
+import Setting from "./pages/Setting";
 
 const App = () => {
   return (
@@ -14,6 +17,9 @@ const App = () => {
         <Route path="/verifyotp" element={<VerifyOtp />} />
         <Route path="/dashboard" element={<AppLayout />}>
           <Route path="tasks" element={<TaskList />} />
+          <Route path="inprogress-task" element={<InProgressTaskList />} />
+          <Route path="completed-task" element={<CompletedTaskList />} />
+          <Route path="setting" element={<Setting />} />
           <Route index element={<Dashboard />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />

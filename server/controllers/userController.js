@@ -389,3 +389,21 @@ exports.deleteUser = async (req, res) => {
     res.InternalError({}, "Internal server error");
   }
 };
+
+
+exports.logoutUser = (req, res) => {
+  try {
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: false, 
+      sameSite: "Strict",
+      expires: new Date(0),
+    });
+
+    return res.Ok({}, "Logged out successfully");
+  } catch (error) {
+    console.log(error.message);
+    return res.InternalError({}, "Internal server error");
+  }
+};
+

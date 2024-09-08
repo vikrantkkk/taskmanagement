@@ -16,12 +16,12 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import axios from "axios";
-import EditTaskDialog from "./EditTaskModal";
-import DeleteTaskDialog from "./DeleteTaskModal";
 import moment from "moment"; // Import moment.js for date formatting
 import { useSnackbar } from "notistack";
+import EditTaskDialog from "../components/EditTaskModal";
+import DeleteTaskDialog from "../components/DeleteTaskModal";
 
-const TaskList = () => {
+const CompletedTaskList = () => {
   const [tasks, setTasks] = useState([]);
   const [expandedTaskId, setExpandedTaskId] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -50,7 +50,8 @@ const TaskList = () => {
             },
           }
         );
-        setTasks(data.data);
+        // Filter tasks based on status
+        setTasks(data.data.filter(task => task.status.toLowerCase() === 'completed'));
       } catch (err) {
         console.error(err);
       }
@@ -90,7 +91,6 @@ const TaskList = () => {
   };
 
   const openEditDialog = (task) => {
-    console.log("🚀 ~ openEditDialog ~ task:", task)
     setSelectedTask(task);
     setFormData({
       title: task.title,
@@ -150,7 +150,6 @@ const TaskList = () => {
           },
         }
       );
-      console.log("🚀 ~ handleDelete ~ response?.data?.message:", response);
       enqueueSnackbar(response?.data?.message, { variant: "success" });
       setTasks((prevTasks) =>
         prevTasks.filter((task) => task._id !== selectedTask._id)
@@ -229,7 +228,7 @@ const TaskList = () => {
               <LinearProgress
                 variant="determinate"
                 value={getProgress(task.status)}
-                color={task.status === "complete" ? "success" : "primary"}
+                color={task.status === "completed" ? "success" : "primary"}
                 style={{
                   flexGrow: 1,
                   marginRight: "5px",
@@ -250,8 +249,6 @@ const TaskList = () => {
               <Typography variant="body2" paragraph>
                 {task.description}
               </Typography>
-              {/* Show assignee and created date inside Collapse */}
-
               <Typography variant="body2" color="textSecondary">
                 Created On:{" "}
                 {moment(task.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
@@ -309,4 +306,4 @@ const TaskList = () => {
   );
 };
 
-export default TaskList;
+export default CompletedTaskList;

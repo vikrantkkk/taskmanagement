@@ -20,17 +20,17 @@ const Sidebar = () => {
           </li>
           <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
             <HourglassEmpty />
-            <Link to="/tasks/in-progress" className="text-white">In Progress</Link>
+            <Link to="/dashboard/inprogress-task" className="text-white">In Progress</Link>
           </li>
           <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
             <CheckCircle />
-            <Link to="/tasks/completed" className="text-white">Completed</Link>
+            <Link to="/dashboard/completed-task" className="text-white">Completed</Link>
           </li>
 
           {/* Settings */}
           <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
             <Settings />
-            <Link to="/settings" className="text-white">Settings</Link>
+            <Link to="/dashboard/setting" className="text-white">Settings</Link>
           </li>
         </ul>
       </nav>
