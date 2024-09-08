@@ -1,6 +1,5 @@
 const Task = require("../models/taskModel");
 const User = require("../models/userModel");
-const { sendNotification } = require("../socket");
 
 exports.createTask = async (req, res) => {
   try {
@@ -23,34 +22,14 @@ exports.createTask = async (req, res) => {
       owner: req.user.userId,
       assignedTo: assignedTo || null,
     });
-
-    // Notify the task owner
-    const ownerNotification = {
-      userId: req.user.userId,
-      message: `You have created a new task: ${title}`,
-      taskId: newTask._id,
-    };
-    console.log("Sending owner notification:", ownerNotification);
-    sendNotification(req.user.userId, ownerNotification);
-
-    // Notify the assignee (if assigned)
-    if (assignedTo) {
-      const assigneeNotification = {
-        userId: assignedTo,
-        message: `New task assigned to you: ${title}`,
-        taskId: newTask._id,
-      };
-      console.log("Sending assignee notification:", assigneeNotification);
-      sendNotification(assignedTo, assigneeNotification);
-    }
-
-    return res.status(201).json({ task: newTask, message: "Task created successfully" });
+    return res
+      .status(201)
+      .json({ task: newTask, message: "Task created successfully" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 exports.getUserTask = async (req, res) => {
   try {
@@ -105,15 +84,6 @@ exports.updateTask = async (req, res) => {
       .populate("owner", "firstName lastName")
       .populate("assignedTo", "firstName lastName");
 
-    if (assignedTo && assignedTo !== task.assignedTo.toString()) {
-      const notification = {
-        userId: assignedTo,
-        message: `You have been assigned a new task: ${title}`,
-        taskId: updatedTask._id,
-      };
-      io.to(assignedTo).emit("receiveNotification", notification);
-    }
-
     res.Ok(updatedTask, "Task updated successfully");
   } catch (error) {
     console.log(error);
@@ -138,16 +108,6 @@ exports.deleteTask = async (req, res) => {
     }
 
     await Task.findByIdAndDelete(taskId);
-
-    if (task.assignedTo) {
-      const notification = {
-        userId: task.assignedTo,
-        message: `A task assigned to you has been deleted: ${task.title}`,
-        taskId: task._id,
-      };
-      io.to(task.assignedTo).emit("receiveNotification", notification);
-    }
-
     return res.Ok(task, "Task deleted successfully");
   } catch (error) {
     console.error(error);

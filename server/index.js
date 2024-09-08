@@ -1,6 +1,4 @@
 const express = require("express");
-const http = require("http");
-const { initializeSocket } = require("./socket");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
@@ -10,8 +8,6 @@ const reposeHandler = require("./services/responseHandler/send");
 const userRoute = require("./routes/userRoute");
 const taskRoute = require("./routes/taskRoute");
 const app = express();
-const server = http.createServer(app);
-initializeSocket(server); 
 
 app.use(express.json());
 app.use(cookieParser());
@@ -35,10 +31,6 @@ mongoose
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/task", taskRoute);
 
-app.use((req, res) => {
-  console.log("Route not found...");
-  res.status(404).json({ status: false, message: "Route not found..." });
-});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port 🚀 ${PORT}`);

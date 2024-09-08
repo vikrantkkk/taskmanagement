@@ -2,31 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Button, IconButton, Badge } from "@mui/material";
 import { Notifications, AccountCircle } from "@mui/icons-material";
 import CreateTaskDialog from "./CreateTaskDialog";
-import NotificationMenu from "./NotificationMenu";
-import io from "socket.io-client"; // Import Socket.io client
 
 const Header = () => {
   const [openDialog, setOpenDialog] = useState(false); // Dialog state
   const [notifications, setNotifications] = useState([]); // List of notifications
   const [notificationsCount, setNotificationsCount] = useState(0); // Notification count
   const [anchorEl, setAnchorEl] = useState(null); // For notification menu
-
-  useEffect(() => {
-    // Connect to Socket.io server
-    const socket = io("http://localhost:3000"); // Ensure this matches your backend URL
-
-    // Listen for incoming notifications from the server
-    socket.on("receiveNotification", (notification) => {
-      console.log("Notification received:", notification); // For debugging
-      setNotifications((prev) => [...prev, notification]);
-      setNotificationsCount((prev) => prev + 1);
-    });
-
-    // Cleanup socket connection
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
 
   // Function to open the dialog
   const handleOpenDialog = () => {
@@ -88,16 +69,6 @@ const Header = () => {
           <AccountCircle fontSize="large" />
         </IconButton>
       </div>
-
-      {/* Notification Menu */}
-      <NotificationMenu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseNotificationMenu}
-        notifications={notifications}
-        markAsRead={markAsRead}
-      />
-
       {/* Create Task Dialog */}
       <CreateTaskDialog open={openDialog} handleClose={handleCloseDialog} />
     </header>
