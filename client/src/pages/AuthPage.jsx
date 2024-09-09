@@ -17,7 +17,7 @@ const AuthPage = () => {
         <SingleStoreIcon />
         <Box className="font-bold text-lg sm:text-xl text-white">TaskPro</Box>
       </Box>
-
+ 
       <Box className="relative mt-8  w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white p-4 sm:p-8 rounded-lg flex gap-4 flex-col items-center shadow-lg z-10">
         <Box className="text-[#673AB7] font-bold text-lg sm:text-2xl text-center">
           Hi, Welcome Back
