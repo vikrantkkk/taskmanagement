@@ -8,6 +8,7 @@ import TaskList from "./components/TaskList";
 import InProgressTaskList from "./pages/InProgressTaskList";
 import CompletedTaskList from "./pages/CompletedTaskList";
 import Setting from "./pages/Setting";
+import './app.css'
 
 const App = () => {
   return (
