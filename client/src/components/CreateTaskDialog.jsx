@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -7,40 +7,80 @@ import {
   DialogTitle,
   TextField,
   MenuItem,
-  Select,
+  Select as MuiSelect,
   InputLabel,
   FormControl,
+  Autocomplete,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
-import { useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 
 // Validation schema
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
+  description: yup.string(),
+  status: yup.string().required("Status is required"),
+  priority: yup.string().required("Priority is required"),
+  assignedTo: yup.array().of(
+    yup.object().shape({
+      value: yup.string().required(),
+      label: yup.string().required(),
+    })
+  ),
+  dueDate: yup.date().required("Due date is required"),
 });
 
 const CreateTaskDialog = ({ open, handleClose }) => {
   const { enqueueSnackbar } = useSnackbar();
+  const [users, setUsers] = useState([]);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({
     resolver: yupResolver(schema),
   });
 
   const token = localStorage.getItem("token");
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/user/get-all-user`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setUsers(
+          data.data.map(user => ({
+            value: user._id,
+            label: user.name, // Adjust according to the user data structure
+          }))
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchUsers();
+  }, [token]);
+
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/task/create-task`,
-        data,
+        {
+          ...data,
+          assignedTo: data.assignedTo.map(user => user.value), // Convert to array of user IDs
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -56,8 +96,8 @@ const CreateTaskDialog = ({ open, handleClose }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle className="px-6 py-4">Create New Task</DialogTitle>
-      <DialogContent className="p-6">
+      <DialogTitle>Create New Task</DialogTitle>
+      <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           {/* Title */}
           <Controller
@@ -91,84 +131,95 @@ const CreateTaskDialog = ({ open, handleClose }) => {
                 margin="dense"
                 variant="outlined"
                 error={!!errors.description}
-                helperText={
-                  errors.description ? errors.description.message : ""
-                }
+                helperText={errors.description ? errors.description.message : ""}
                 className="mb-4"
               />
             )}
           />
 
           {/* Status */}
-          <FormControl
-            fullWidth
-            margin="dense"
-            variant="outlined"
-            className="mb-4"
-          >
+          <FormControl fullWidth margin="dense" variant="outlined" className="mb-4">
             <InputLabel>Status</InputLabel>
             <Controller
               name="status"
               control={control}
               render={({ field }) => (
-                <Select {...field} label="Status">
+                <MuiSelect {...field} label="Status">
                   <MenuItem value="pending">Pending</MenuItem>
                   <MenuItem value="inprogress">In Progress</MenuItem>
                   <MenuItem value="completed">Completed</MenuItem>
-                </Select>
+                </MuiSelect>
               )}
             />
           </FormControl>
 
           {/* Priority */}
-          <FormControl
-            fullWidth
-            margin="dense"
-            variant="outlined"
-            className="mb-4"
-          >
+          <FormControl fullWidth margin="dense" variant="outlined" className="mb-4">
             <InputLabel>Priority</InputLabel>
             <Controller
               name="priority"
               control={control}
               render={({ field }) => (
-                <Select {...field} label="Priority">
+                <MuiSelect {...field} label="Priority">
                   <MenuItem value="low">Low</MenuItem>
                   <MenuItem value="medium">Medium</MenuItem>
                   <MenuItem value="high">High</MenuItem>
-                </Select>
+                </MuiSelect>
               )}
             />
           </FormControl>
+
+          {/* Due Date */}
+          <Controller
+            name="dueDate"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Due Date"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                margin="dense"
+                variant="outlined"
+                error={!!errors.dueDate}
+                helperText={errors.dueDate ? errors.dueDate.message : ""}
+                className="mb-4"
+              />
+            )}
+          />
 
           {/* Assigned To */}
           <Controller
             name="assignedTo"
             control={control}
             render={({ field }) => (
-              <TextField
+              <Autocomplete
                 {...field}
-                label="Assigned To (User ID)"
-                fullWidth
-                margin="dense"
-                variant="outlined"
-                error={!!errors.assignedTo}
-                helperText={errors.assignedTo ? errors.assignedTo.message : ""}
+                multiple
+                options={users}
+                getOptionLabel={(option) => option.label}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Assigned To"
+                    variant="outlined"
+                    error={!!errors.assignedTo}
+                    helperText={errors.assignedTo ? errors.assignedTo.message : ""}
+                  />
+                )}
+                onChange={(_, newValue) => setValue("assignedTo", newValue)}
                 className="mb-4"
               />
             )}
           />
         </form>
       </DialogContent>
-      <DialogActions className="p-6">
+      <DialogActions>
         <Button
           onClick={handleClose}
           color="primary"
-          sx={{
-            borderColor: "#673AB7",
-            color: "#673AB7",
-            "&:hover": { borderColor: "#673AB7", backgroundColor: "#EDE7F6" },
-          }}
+          variant="outlined"
         >
           Cancel
         </Button>
@@ -176,12 +227,6 @@ const CreateTaskDialog = ({ open, handleClose }) => {
           onClick={handleSubmit(onSubmit)}
           color="primary"
           variant="contained"
-          sx={{
-            backgroundColor: "#673AB7",
-            "&:hover": {
-              backgroundColor: "#5e35b1", // Hover color
-            },
-          }}
         >
           Create Task
         </Button>

@@ -18,7 +18,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import axios from "axios";
 import EditTaskDialog from "./EditTaskModal";
 import DeleteTaskDialog from "./DeleteTaskModal";
-import moment from "moment"; // Import moment.js for date formatting
+import moment from "moment";
 import { useSnackbar } from "notistack";
 
 const TaskList = () => {
@@ -38,6 +38,7 @@ const TaskList = () => {
   const [anchorEl, setAnchorEl] = useState(null); // for menu
   const { enqueueSnackbar } = useSnackbar();
   const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId"); // Assume user ID is stored in localStorage
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -90,7 +91,6 @@ const TaskList = () => {
   };
 
   const openEditDialog = (task) => {
-    console.log("🚀 ~ openEditDialog ~ task:", task)
     setSelectedTask(task);
     setFormData({
       title: task.title,
@@ -113,9 +113,7 @@ const TaskList = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/task/update-task/${
-          selectedTask._id
-        }`,
+        `${import.meta.env.VITE_API_BASE_URL}/task/update-task/${selectedTask._id}`,
         formData,
         {
           headers: {
@@ -141,16 +139,13 @@ const TaskList = () => {
     setLoading(true);
     try {
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/task/delete-task/${
-          selectedTask._id
-        }`,
+        `${import.meta.env.VITE_API_BASE_URL}/task/delete-task/${selectedTask._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log("🚀 ~ handleDelete ~ response?.data?.message:", response);
       enqueueSnackbar(response?.data?.message, { variant: "success" });
       setTasks((prevTasks) =>
         prevTasks.filter((task) => task._id !== selectedTask._id)
@@ -183,7 +178,7 @@ const TaskList = () => {
       {tasks.map((task) => (
         <Card
           key={task._id}
-          className="relative shadow-lg rounded-lg bg-gray-50 flex flex-col"
+          className="relative shadow-lg rounded-lg bg-white flex flex-col border border-gray-200"
         >
           <CardContent className="flex-1 p-4">
             <div className="absolute top-2 right-2">
@@ -196,10 +191,11 @@ const TaskList = () => {
             </div>
 
             <Typography
-              variant="h5"
+              variant="h6"
               component="div"
               gutterBottom
               fontWeight="bold"
+              color="text.primary"
             >
               {task.title}
             </Typography>
@@ -208,7 +204,7 @@ const TaskList = () => {
               icon={<PriorityHighIcon />}
               label={`Priority: ${task.priority}`}
               color={getPriorityColor(task.priority)}
-              className="my-2 font-bold"
+              className="my-2"
             />
 
             <Typography
@@ -220,6 +216,16 @@ const TaskList = () => {
               Status: {task.status}
             </Typography>
 
+            {task.assignedTo?._id !== userId && (
+              <Typography
+                variant="body2"
+                color="text.primary"
+                className="mt-2"
+              >
+                Assigned By: {task.assignedBy?.name || "Unassigned"}
+              </Typography>
+            )}
+
             <Box
               my={2}
               display="flex"
@@ -229,7 +235,7 @@ const TaskList = () => {
               <LinearProgress
                 variant="determinate"
                 value={getProgress(task.status)}
-                color={task.status === "complete" ? "success" : "primary"}
+                color={task.status === "completed" ? "success" : "primary"}
                 style={{
                   flexGrow: 1,
                   marginRight: "5px",
@@ -237,7 +243,7 @@ const TaskList = () => {
                   borderRadius: "10px",
                 }}
               />
-              <Typography variant="body2">
+              <Typography variant="body2" color="text.secondary">
                 {getProgress(task.status)}%
               </Typography>
             </Box>
@@ -247,12 +253,10 @@ const TaskList = () => {
               timeout="auto"
               unmountOnExit
             >
-              <Typography variant="body2" paragraph>
+              <Typography variant="body2" paragraph color="text.primary">
                 {task.description}
               </Typography>
-              {/* Show assignee and created date inside Collapse */}
-
-              <Typography variant="body2" color="textSecondary">
+              <Typography variant="body2" color="text.secondary">
                 Created On:{" "}
                 {moment(task.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
               </Typography>
@@ -276,6 +280,11 @@ const TaskList = () => {
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
+            PaperProps={{
+              style: {
+                width: '200px',
+              },
+            }}
           >
             <MenuItem onClick={() => openEditDialog(selectedTask)}>
               Edit
@@ -295,6 +304,7 @@ const TaskList = () => {
         setFormData={setFormData}
         handleEditSubmit={handleEditSubmit}
         loading={loading}
+        assignees={tasks.map((task) => task.assignedTo)} // Assuming you want to display a list of assignees
       />
 
       {/* Delete Task Dialog */}
