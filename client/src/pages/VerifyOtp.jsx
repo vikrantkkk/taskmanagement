@@ -9,6 +9,7 @@ import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { useVerifyOtpMutation } from "../redux/api/userApi";
 import { verifyOtp } from "../redux/userSlice";
+import SingleStoreIcon from "../assets/icons/SingleStoreIcon"; // Your logo icon
 
 // Validation schema
 const otpSchema = yup.object().shape({
@@ -70,11 +71,22 @@ const VerifyOtp = () => {
   };
 
   return (
-    <Box className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+    <Box className="min-h-screen p-4 sm:p-8 flex items-center justify-center relative overflow-hidden bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
+      {/* Rotating background elements */}
+      <Box className="absolute w-64 h-64 rounded-full bg-white opacity-20 animate-spin-slow top-1/4 left-1/4"></Box>
+      <Box className="absolute w-96 h-96 rounded-full bg-white opacity-10 animate-spin-slow top-2/4 right-1/4"></Box>
+
+      {/* Logo in the top-left corner */}
+      <Box className="absolute top-4 left-4 flex items-center gap-2">
+        <SingleStoreIcon />
+        <Typography className="font-bold text-lg sm:text-xl text-white">TaskPro</Typography>
+      </Box>
+
+      {/* Main form box */}
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md p-8 border border-gray-300 rounded-lg shadow-lg bg-white"
+        className="relative w-full max-w-md p-8 border border-gray-300 rounded-lg shadow-lg bg-white z-10"
       >
         <Box className="flex justify-center mb-4">
           <EmailIcon sx={{ fontSize: "3rem", color: "#673AB7" }} />
@@ -128,6 +140,7 @@ const VerifyOtp = () => {
           </Typography>
         )}
 
+        {/* Buttons */}
         <Box className="flex items-center justify-center gap-4 w-full mt-4">
           <Button
             variant="outlined"

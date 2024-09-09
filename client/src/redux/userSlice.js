@@ -12,6 +12,7 @@ const authSlice = createSlice({
   reducers: {
     register: (state, action) => {
       const { data, message, success, timestamp } = action.payload;
+      localStorage.setItem("token",data.token)
       state.user = data; // Store the user data
       state.isLoggedIn = success;
       state.message = message;

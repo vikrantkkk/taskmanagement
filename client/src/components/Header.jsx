@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Button, IconButton, Badge, Popover, MenuItem, MenuList, ListItemText, ListItem } from '@mui/material';
-import { Notifications, AccountCircle } from '@mui/icons-material';
-import CreateTaskDialog from './CreateTaskDialog';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import io from 'socket.io-client'; // Import socket.io-client
+import React, { useState, useEffect } from "react";
+import {
+  Button,
+  IconButton,
+  Badge,
+  Popover,
+  MenuItem,
+  MenuList,
+  ListItemText,
+  ListItem,
+} from "@mui/material";
+import { Notifications, AccountCircle } from "@mui/icons-material";
+import CreateTaskDialog from "./CreateTaskDialog";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import io from "socket.io-client"; // Import socket.io-client
 
 const socket = io("http://localhost:5000"); // Connect to your backend socket
 
@@ -59,17 +68,20 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/logout`);
-      localStorage.removeItem('token');
-      navigate('/');
+      localStorage.removeItem("token");
+      navigate("/");
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
   // Listen for task notifications via socket.io
   useEffect(() => {
     socket.on("newTaskNotification", (notification) => {
-      setNotifications((prevNotifications) => [...prevNotifications, notification]);
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        notification,
+      ]);
       setNotificationsCount((prevCount) => prevCount + 1);
     });
 
@@ -79,7 +91,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="p-4 flex items-center justify-between bg-blue-600 text-white">
+    <header className="p-4 flex items-center justify-between shadow-lg">
       <h1 className="text-2xl font-bold">Task Manager</h1>
 
       <div className="flex items-center space-x-4">
@@ -97,18 +109,21 @@ const Header = () => {
         </Button>
 
         {/* Notifications Icon with Badge */}
-        <IconButton sx={{ color: "white" }} onClick={handleNotificationClick}>
+        <IconButton sx={{ color: "gray" }} onClick={handleNotificationClick}>
           <Badge badgeContent={notificationsCount} color="error">
             <Notifications fontSize="large" />
           </Badge>
         </IconButton>
 
-        <IconButton sx={{ color: "white" }} onClick={handleOpenProfileMenu}>
+        <IconButton sx={{ color: "gray" }} onClick={handleOpenProfileMenu}>
           <AccountCircle fontSize="large" />
         </IconButton>
       </div>
 
-      <CreateTaskDialog open={openCreateTaskDialog} handleClose={handleCloseCreateTaskDialog} />
+      <CreateTaskDialog
+        open={openCreateTaskDialog}
+        handleClose={handleCloseCreateTaskDialog}
+      />
 
       {/* Notifications Popover */}
       <Popover
@@ -116,12 +131,12 @@ const Header = () => {
         anchorEl={anchorEl}
         onClose={handleCloseNotificationMenu}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
+          vertical: "bottom",
+          horizontal: "center",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
+          vertical: "top",
+          horizontal: "center",
         }}
       >
         <MenuList>
@@ -148,19 +163,23 @@ const Header = () => {
         anchorEl={profileMenuAnchorEl}
         onClose={handleCloseProfileMenu}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
+          vertical: "bottom",
+          horizontal: "center",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
+          vertical: "top",
+          horizontal: "center",
         }}
         sx={{ marginTop: 1 }}
       >
         <div className="p-2">
           <MenuList>
-            <MenuItem onClick={() => navigate("/dashboard/setting")}>Profile</MenuItem>
-            <MenuItem onClick={() => navigate("/dashboard/setting")}>Settings</MenuItem>
+            <MenuItem onClick={() => navigate("/dashboard/setting")}>
+              Profile
+            </MenuItem>
+            <MenuItem onClick={() => navigate("/dashboard/setting")}>
+              Settings
+            </MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </MenuList>
         </div>

@@ -87,6 +87,7 @@ const EditTaskDialog = ({
           select
           value={formData.assignedTo || ""}
           onChange={handleInputChange}
+          disabled
         >
           {assignees?.map((assignee) => (
             <MenuItem key={assignee._id} value={assignee._id}>

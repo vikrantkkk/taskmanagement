@@ -10,6 +10,10 @@ import {
   Collapse,
   Menu,
   MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  CircularProgress,
 } from "@mui/material";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -23,6 +27,7 @@ import { useSnackbar } from "notistack";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
   const [expandedTaskId, setExpandedTaskId] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -36,12 +41,14 @@ const TaskList = () => {
   });
   const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null); // for menu
+  const [selectedPriority, setSelectedPriority] = useState(""); // for priority filter
   const { enqueueSnackbar } = useSnackbar();
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId"); // Assume user ID is stored in localStorage
 
   useEffect(() => {
     const fetchTasks = async () => {
+      setLoading(true);
       try {
         const { data } = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/task/get-user-task`,
@@ -52,13 +59,29 @@ const TaskList = () => {
           }
         );
         setTasks(data.data);
+        setFilteredTasks(data.data);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchTasks();
   }, [token]);
+
+  useEffect(() => {
+    if (selectedPriority === "") {
+      setFilteredTasks(tasks);
+    } else {
+      setFilteredTasks(
+        tasks.filter(
+          (task) =>
+            task.priority.toLowerCase() === selectedPriority.toLowerCase()
+        )
+      );
+    }
+  }, [selectedPriority, tasks]);
 
   const getProgress = (status) => {
     switch (status.toLowerCase()) {
@@ -178,141 +201,165 @@ const TaskList = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-      {tasks.map((task) => (
-        <Card
-          key={task._id}
-          className="relative shadow-lg rounded-lg bg-white flex flex-col border border-gray-200"
+    <div className="">
+      <Box sx={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
+        <FormControl
+          fullWidth
+          margin="normal"
+          sx={{ width: "10rem"}}
         >
-          <CardContent className="flex-1 p-4">
-            <div className="absolute top-2 right-2">
-              <IconButton
-                size="small"
-                onClick={(event) => handleMenuClick(event, task)}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            </div>
-
-            <Typography
-              variant="h6"
-              component="div"
-              gutterBottom
-              fontWeight="bold"
-              color="text.primary"
-            >
-              {task.title}
-            </Typography>
-
-            <Chip
-              icon={<PriorityHighIcon />}
-              label={`Priority: ${task.priority}`}
-              color={getPriorityColor(task.priority)}
-              className="my-2"
-            />
-
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              fontStyle="italic"
-            >
-              Status: {task.status}
-            </Typography>
-
-            {task.assignedTo?._id !== userId && (
-              <Typography variant="body2" color="text.primary" className="mt-2">
-                Assigned By: {task.assignedBy?.name || "Unassigned"}
-              </Typography>
-            )}
-
-            <Box
-              my={2}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <LinearProgress
-                variant="determinate"
-                value={getProgress(task.status)}
-                color={task.status === "completed" ? "success" : "primary"}
-                style={{
-                  flexGrow: 1,
-                  marginRight: "5px",
-                  height: 10,
-                  borderRadius: "10px",
-                }}
-              />
-              <Typography variant="body2" color="text.secondary">
-                {getProgress(task.status)}%
-              </Typography>
-            </Box>
-
-            <Collapse
-              in={expandedTaskId === task._id}
-              timeout="auto"
-              unmountOnExit
-            >
-              <Typography variant="body2" paragraph color="text.primary">
-                {task.description}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Created On:{" "}
-                {moment(task.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
-              </Typography>
-            </Collapse>
-
-            <IconButton
-              size="small"
-              onClick={() => handleExpandClick(task._id)}
-              className="absolute bottom-2 right-2"
-            >
-              {expandedTaskId === task._id ? (
-                <ExpandLessIcon />
-              ) : (
-                <ExpandMoreIcon />
-              )}
-            </IconButton>
-          </CardContent>
-
-          {/* Menu for Edit/Delete */}
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-            PaperProps={{
-              style: {
-                width: "200px",
-              },
-            }}
+          <InputLabel id="priority-filter-label">Filter by Priority</InputLabel>
+          <Select
+            labelId="priority-filter-label"
+            value={selectedPriority}
+            onChange={(e) => setSelectedPriority(e.target.value)}
+            label="Filter by Priority"
           >
-            <MenuItem onClick={() => openEditDialog(selectedTask)}>
-              Edit
-            </MenuItem>
-            <MenuItem onClick={() => openDeleteDialog(selectedTask)}>
-              Delete
-            </MenuItem>
-          </Menu>
-        </Card>
-      ))}
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="high">High</MenuItem>
+            <MenuItem value="medium">Medium</MenuItem>
+            <MenuItem value="low">Low</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
-      <EditTaskDialog
-        open={editDialogOpen}
-        handleClose={() => setEditDialogOpen(false)}
-        formData={formData}
-        setFormData={setFormData}
-        handleEditSubmit={handleEditSubmit}
-        loading={loading}
-        isEditMode={true} // This tells the dialog to behave in edit mode
-      />
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {filteredTasks.map((task) => (
+            <Card
+              key={task._id}
+              className="relative shadow-lg rounded-lg bg-white flex flex-col border border-gray-200"
+            >
+              <CardContent className="flex-1 p-4">
+                <div className="absolute top-2 right-2">
+                  <IconButton
+                    size="small"
+                    onClick={(event) => handleMenuClick(event, task)}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </div>
 
-      <DeleteTaskDialog
-        open={deleteDialogOpen}
-        handleClose={() => setDeleteDialogOpen(false)}
-        selectedTask={selectedTask}
-        handleDelete={handleDelete}
-        loading={loading}
-      />
+                <Typography
+                  variant="h6"
+                  component="div"
+                  gutterBottom
+                  fontWeight="bold"
+                  color="text.primary"
+                >
+                  {task.title}
+                </Typography>
+
+                <Chip
+                  icon={<PriorityHighIcon />}
+                  label={`Priority: ${task.priority}`}
+                  color={getPriorityColor(task.priority)}
+                  className="my-2"
+                />
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  gutterBottom
+                  fontStyle="italic"
+                >
+                  Status: {task.status}
+                </Typography>
+
+                {task.assignedTo?._id !== userId && (
+                  <Typography
+                    variant="body2"
+                    color="text.primary"
+                    className="mt-2"
+                  >
+                    Assigned By: {task.assignedBy?.name || ""}
+                  </Typography>
+                )}
+
+                <Box
+                  my={2}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <LinearProgress
+                    variant="determinate"
+                    value={getProgress(task.status)}
+                    color={task.status === "completed" ? "success" : "primary"}
+                    style={{
+                      flexGrow: 1,
+                      marginRight: "5px",
+                      height: 10,
+                      borderRadius: "10px",
+                    }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {getProgress(task.status)}%
+                  </Typography>
+                </Box>
+
+                <Collapse
+                  in={expandedTaskId === task._id}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <Typography variant="body2" paragraph color="text.primary">
+                    {task.description}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Created On:{" "}
+                    {moment(task.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
+                  </Typography>
+                </Collapse>
+              </CardContent>
+
+              <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center">
+                <IconButton onClick={() => handleExpandClick(task._id)}>
+                  {expandedTaskId === task._id ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
+                </IconButton>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Edit Task Dialog */}
+      {selectedTask && (
+        <EditTaskDialog
+          open={editDialogOpen}
+          handleClose={() => setEditDialogOpen(false)}
+          handleSubmit={handleEditSubmit}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      )}
+
+      {/* Delete Task Dialog */}
+      {selectedTask && (
+        <DeleteTaskDialog
+          open={deleteDialogOpen}
+          handleClose={() => setDeleteDialogOpen(false)}
+          handleDelete={handleDelete}
+        />
+      )}
+
+      {/* Menu for Edit and Delete options */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={() => openEditDialog(selectedTask)}>Edit</MenuItem>
+        <MenuItem onClick={() => openDeleteDialog(selectedTask)}>
+          Delete
+        </MenuItem>
+      </Menu> 
     </div>
   );
 };

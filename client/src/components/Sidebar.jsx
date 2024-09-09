@@ -1,36 +1,87 @@
-import { Link } from 'react-router-dom';
-import { Dashboard, ListAlt, TaskAlt, HourglassEmpty, CheckCircle, Settings } from '@mui/icons-material';
+import { Link, useLocation } from "react-router-dom";
+import {
+  Dashboard,
+  ListAlt,
+  HourglassEmpty,
+  CheckCircle,
+  Settings,
+} from "@mui/icons-material";
+import { Box, Typography } from "@mui/material";
+import SingleStoreIcon from "../assets/icons/SingleStoreIcon"; // Update this path if needed
 
 const Sidebar = () => {
+  const location = useLocation(); // Get current route path
+
+  // Define active link background color and hover states
+  const activeClassName = "bg-blue-700 text-white"; // Active background color
+  const inactiveClassName = "hover:bg-blue-600"; // Hover color for inactive links
+
   return (
-    <aside className="w-64 bg-gray-800 text-white h-screen p-4 shadow-lg">
-      <h2 className="text-2xl font-semibold text-center mb-6">Menu</h2>
-      <nav>
+    <aside className="w-64 bg-gray-900 text-white h-screen p-4 shadow-lg flex flex-col">
+      {/* Logo and Title */}
+      <Box className="flex items-center gap-2 mb-6 p-4 bg-gray-800 rounded-lg">
+        <SingleStoreIcon className="w-10 h-10" /> {/* Adjust the size as needed */}
+        <Typography variant="h5" className="font-bold text-white">
+          TaskPro
+        </Typography>
+      </Box>
+
+      {/* Navigation Links */}
+      <nav className="flex-1">
         <ul className="space-y-4">
           {/* Dashboard */}
-          <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
-            <Dashboard />
-            <Link to="/dashboard" className="text-white">Dashboard</Link>
+          <li className="flex items-center rounded-lg p-2">
+            <Link
+              to="/dashboard"
+              className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard" ? activeClassName : inactiveClassName}`}
+            >
+              <Dashboard fontSize="small" />
+              <Typography>Dashboard</Typography>
+            </Link>
           </li>
 
-          {/* Task-related links */}
-          <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
-            <ListAlt />
-            <Link to="/dashboard/tasks" className="text-white">All Tasks</Link>
+          {/* All Tasks */}
+          <li className="flex items-center rounded-lg p-2">
+            <Link
+              to="/dashboard/tasks"
+              className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/tasks" ? activeClassName : inactiveClassName}`}
+            >
+              <ListAlt fontSize="small" />
+              <Typography>All Tasks</Typography>
+            </Link>
           </li>
-          <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
-            <HourglassEmpty />
-            <Link to="/dashboard/inprogress-task" className="text-white">In Progress</Link>
+
+          {/* In Progress */}
+          <li className="flex items-center rounded-lg p-2">
+            <Link
+              to="/dashboard/inprogress-task"
+              className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/inprogress-task" ? activeClassName : inactiveClassName}`}
+            >
+              <HourglassEmpty fontSize="small" />
+              <Typography>In Progress</Typography>
+            </Link>
           </li>
-          <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
-            <CheckCircle />
-            <Link to="/dashboard/completed-task" className="text-white">Completed</Link>
+
+          {/* Completed */}
+          <li className="flex items-center rounded-lg p-2">
+            <Link
+              to="/dashboard/completed-task"
+              className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/completed-task" ? activeClassName : inactiveClassName}`}
+            >
+              <CheckCircle fontSize="small" />
+              <Typography>Completed</Typography>
+            </Link>
           </li>
 
           {/* Settings */}
-          <li className="flex items-center space-x-2 hover:bg-gray-700 rounded-lg p-2">
-            <Settings />
-            <Link to="/dashboard/setting" className="text-white">Settings</Link>
+          <li className="flex items-center rounded-lg p-2">
+            <Link
+              to="/dashboard/setting"
+              className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/setting" ? activeClassName : inactiveClassName}`}
+            >
+              <Settings fontSize="small" />
+              <Typography>Settings</Typography>
+            </Link>
           </li>
         </ul>
       </nav>
