@@ -1,4 +1,3 @@
-// DeleteTaskDialog.js
 import React from "react";
 import {
   Dialog,
@@ -13,23 +12,28 @@ import {
 const DeleteTaskDialog = ({
   open,
   handleClose,
-  selectedTask,
   handleDelete,
+  selectedTask,
   loading,
 }) => {
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Confirm Delete</DialogTitle>
+    <Dialog open={open} onClose={handleClose} fullWidth>
+      <DialogTitle>Delete Task</DialogTitle>
       <DialogContent>
         <Typography>
           Are you sure you want to delete the task "{selectedTask?.title}"?
         </Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
+        <Button onClick={handleClose} color="secondary">
           Cancel
         </Button>
-        <Button onClick={handleDelete} color="secondary" disabled={loading}>
+        <Button
+          onClick={handleDelete}
+          color="primary"
+          disabled={loading}
+          variant="contained"
+        >
           {loading ? <CircularProgress size={24} /> : "Delete"}
         </Button>
       </DialogActions>

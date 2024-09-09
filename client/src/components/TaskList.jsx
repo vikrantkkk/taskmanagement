@@ -113,7 +113,9 @@ const TaskList = () => {
     setLoading(true);
     try {
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/task/update-task/${selectedTask._id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/task/update-task/${
+          selectedTask._id
+        }`,
         formData,
         {
           headers: {
@@ -139,7 +141,9 @@ const TaskList = () => {
     setLoading(true);
     try {
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/task/delete-task/${selectedTask._id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/task/delete-task/${
+          selectedTask._id
+        }`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -217,11 +221,7 @@ const TaskList = () => {
             </Typography>
 
             {task.assignedTo?._id !== userId && (
-              <Typography
-                variant="body2"
-                color="text.primary"
-                className="mt-2"
-              >
+              <Typography variant="body2" color="text.primary" className="mt-2">
                 Assigned By: {task.assignedBy?.name || "Unassigned"}
               </Typography>
             )}
@@ -282,7 +282,7 @@ const TaskList = () => {
             onClose={handleMenuClose}
             PaperProps={{
               style: {
-                width: '200px',
+                width: "200px",
               },
             }}
           >
@@ -296,7 +296,6 @@ const TaskList = () => {
         </Card>
       ))}
 
-      {/* Edit Task Dialog */}
       <EditTaskDialog
         open={editDialogOpen}
         handleClose={() => setEditDialogOpen(false)}
@@ -304,10 +303,9 @@ const TaskList = () => {
         setFormData={setFormData}
         handleEditSubmit={handleEditSubmit}
         loading={loading}
-        assignees={tasks.map((task) => task.assignedTo)} // Assuming you want to display a list of assignees
+        isEditMode={true} // This tells the dialog to behave in edit mode
       />
 
-      {/* Delete Task Dialog */}
       <DeleteTaskDialog
         open={deleteDialogOpen}
         handleClose={() => setDeleteDialogOpen(false)}

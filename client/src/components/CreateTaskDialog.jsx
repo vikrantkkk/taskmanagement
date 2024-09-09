@@ -21,15 +21,6 @@ import { useSnackbar } from "notistack";
 // Validation schema
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
-  description: yup.string(),
-  status: yup.string().required("Status is required"),
-  priority: yup.string().required("Priority is required"),
-  assignedTo: yup.array().of(
-    yup.object().shape({
-      value: yup.string().required(),
-      label: yup.string().required(),
-    })
-  ),
   dueDate: yup.date().required("Due date is required"),
 });
 
@@ -42,6 +33,7 @@ const CreateTaskDialog = ({ open, handleClose }) => {
     handleSubmit,
     formState: { errors },
     setValue,
+    reset
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -88,6 +80,7 @@ const CreateTaskDialog = ({ open, handleClose }) => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
+      reset();
       handleClose();
     } catch (error) {
       console.log(error);

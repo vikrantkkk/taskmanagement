@@ -1,12 +1,12 @@
-// EditTaskDialog.js
 import React from "react";
 import {
   Dialog,
-  DialogActions,
-  DialogContent,
   DialogTitle,
-  TextField,
+  DialogContent,
+  DialogActions,
   Button,
+  TextField,
+  MenuItem,
   CircularProgress,
 } from "@mui/material";
 
@@ -17,74 +17,91 @@ const EditTaskDialog = ({
   setFormData,
   handleEditSubmit,
   loading,
+  assignees,
 }) => {
-  console.log("🚀 ~ formData:", formData)
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Edit Task</DialogTitle>
       <DialogContent>
         <TextField
           label="Title"
+          name="title"
           fullWidth
           margin="normal"
           value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          onChange={handleInputChange}
         />
+
         <TextField
           label="Description"
+          name="description"
           fullWidth
           margin="normal"
+          value={formData.description}
+          onChange={handleInputChange}
           multiline
           rows={4}
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
         />
+
         <TextField
           label="Status"
+          name="status"
           fullWidth
           margin="normal"
           select
-          SelectProps={{ native: true }}
           value={formData.status}
-          onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+          onChange={handleInputChange}
         >
-          <option value="pending">Pending</option>
-          <option value="inprogress">In Progress</option>
-          <option value="completed">Completed</option>
+          <MenuItem value="pending">Pending</MenuItem>
+          <MenuItem value="inprogress">In Progress</MenuItem>
+          <MenuItem value="completed">Completed</MenuItem>
         </TextField>
+
         <TextField
           label="Priority"
+          name="priority"
           fullWidth
           margin="normal"
           select
-          SelectProps={{ native: true }}
           value={formData.priority}
-          onChange={(e) =>
-            setFormData({ ...formData, priority: e.target.value })
-          }
+          onChange={handleInputChange}
         >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <MenuItem value="low">Low</MenuItem>
+          <MenuItem value="medium">Medium</MenuItem>
+          <MenuItem value="high">High</MenuItem>
         </TextField>
+
         <TextField
-          label="Assign To"
+          label="Assigned To"
+          name="assignedTo"
           fullWidth
           margin="normal"
-          value={formData.assignedTo}
-          onChange={(e) =>
-            setFormData({ ...formData, assignedTo: e.target.value })
-          }
-        />
+          select
+          value={formData.assignedTo || ""}
+          onChange={handleInputChange}
+        >
+          {assignees?.map((assignee) => (
+            <MenuItem key={assignee._id} value={assignee._id}>
+              {assignee?.name}
+            </MenuItem>
+          )) || null} 
+        </TextField>
       </DialogContent>
+
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
+        <Button onClick={handleClose} disabled={loading}>
           Cancel
         </Button>
-        <Button onClick={handleEditSubmit} color="primary" disabled={loading}>
-          {loading ? <CircularProgress size={24} /> : "Save"}
+        <Button onClick={handleEditSubmit} disabled={loading}>
+          {loading ? <CircularProgress size={24} /> : "Save Changes"}
         </Button>
       </DialogActions>
     </Dialog>
