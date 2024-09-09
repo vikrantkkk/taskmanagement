@@ -60,7 +60,7 @@ const CreateTaskDialog = ({ open, handleClose }) => {
           }
         );
         setUsers(
-          data.data.map(user => ({
+          data.data.map((user) => ({
             value: user._id,
             label: user.name, // Adjust according to the user data structure
           }))
@@ -79,7 +79,7 @@ const CreateTaskDialog = ({ open, handleClose }) => {
         `${import.meta.env.VITE_API_BASE_URL}/task/create-task`,
         {
           ...data,
-          assignedTo: data.assignedTo.map(user => user.value), // Convert to array of user IDs
+          assignedTo: data?.assignedTo?.map((user) => user?.value) || null,
         },
         {
           headers: {
@@ -131,14 +131,21 @@ const CreateTaskDialog = ({ open, handleClose }) => {
                 margin="dense"
                 variant="outlined"
                 error={!!errors.description}
-                helperText={errors.description ? errors.description.message : ""}
+                helperText={
+                  errors.description ? errors.description.message : ""
+                }
                 className="mb-4"
               />
             )}
           />
 
           {/* Status */}
-          <FormControl fullWidth margin="dense" variant="outlined" className="mb-4">
+          <FormControl
+            fullWidth
+            margin="dense"
+            variant="outlined"
+            className="mb-4"
+          >
             <InputLabel>Status</InputLabel>
             <Controller
               name="status"
@@ -154,7 +161,12 @@ const CreateTaskDialog = ({ open, handleClose }) => {
           </FormControl>
 
           {/* Priority */}
-          <FormControl fullWidth margin="dense" variant="outlined" className="mb-4">
+          <FormControl
+            fullWidth
+            margin="dense"
+            variant="outlined"
+            className="mb-4"
+          >
             <InputLabel>Priority</InputLabel>
             <Controller
               name="priority"
@@ -205,7 +217,9 @@ const CreateTaskDialog = ({ open, handleClose }) => {
                     label="Assigned To"
                     variant="outlined"
                     error={!!errors.assignedTo}
-                    helperText={errors.assignedTo ? errors.assignedTo.message : ""}
+                    helperText={
+                      errors.assignedTo ? errors.assignedTo.message : ""
+                    }
                   />
                 )}
                 onChange={(_, newValue) => setValue("assignedTo", newValue)}
@@ -216,11 +230,7 @@ const CreateTaskDialog = ({ open, handleClose }) => {
         </form>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={handleClose}
-          color="primary"
-          variant="outlined"
-        >
+        <Button onClick={handleClose} color="primary" variant="outlined">
           Cancel
         </Button>
         <Button
