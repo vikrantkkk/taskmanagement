@@ -1,35 +1,41 @@
 const Task = require("../models/taskModel");
 const User = require("../models/userModel");
 
+// Create Task Controller
 exports.createTask = async (req, res) => {
   try {
-    const { title, description, status, priority, assignedTo } = req.body;
+    const { title, description, status, priority, assignedTo, dueDate } = req.body;
+    
     if (!title) {
       return res.BadRequest({ message: "Title is required" });
     }
-    if (assignedTo) {
-      const user = await User.findById(assignedTo);
-      if (!user) {
-        return res.NotFound({ message: "User not found" });
+
+    // Validate multiple assignees
+    if (assignedTo && assignedTo.length > 0) {
+      const users = await User.find({ _id: { $in: assignedTo } });
+      if (users.length !== assignedTo.length) {
+        return res.NotFound({ message: "One or more assigned users not found" });
       }
     }
 
+    // Create new task
     const newTask = await Task.create({
       title,
       description,
       status,
       priority,
       owner: req.user.userId,
-      assignedTo: assignedTo || null,
+      assignedTo: assignedTo || [], // Assign empty array if no users assigned
+      dueDate: dueDate || null, // Handle due date
     });
 
+    // Emit real-time notification for task creation
     const io = req.app.get("io");
-    io.emit("newTaskNotification", { 
+    io.emit("newTaskNotification", {
       message: `Task "${newTask.title}" has been created!`,
       taskId: newTask._id,
       timestamp: new Date()
     });
-    
 
     const newTaskData = JSON.parse(JSON.stringify(newTask));
     return res.Create(newTaskData, "Task created successfully");
@@ -39,12 +45,13 @@ exports.createTask = async (req, res) => {
   }
 };
 
+// Get User's Tasks Controller
 exports.getUserTask = async (req, res) => {
   try {
     const { userId } = req.user;
 
     const tasks = await Task.find({
-      $or: [{ owner: userId }, { assignedTo: userId }],
+      $or: [{ owner: userId }, { assignedTo: { $in: [userId] } }]
     })
       .populate("owner", "firstName lastName")
       .populate("assignedTo", "firstName lastName");
@@ -53,29 +60,40 @@ exports.getUserTask = async (req, res) => {
       return res.NotFound({}, "No tasks found for the user");
     }
 
-    res.Ok(tasks, "All Task fetched successfully");
+    res.Ok(tasks, "All tasks fetched successfully");
   } catch (error) {
     console.log(error);
     res.InternalError({}, "Internal server error");
   }
 };
 
+// Update Task Controller
 exports.updateTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { title, description, status, priority, assignedTo } = req.body;
+    const { title, description, status, priority, assignedTo, dueDate } = req.body;
+    
     const task = await Task.findById(taskId);
     if (!task) {
       return res.NotFound({}, "Task not found");
     }
 
-    if (
-      task.owner.toString() !== req.user.userId &&
-      task.assignedTo.toString() !== req.user.userId
-    ) {
+    // Check authorization: only task owner or assigned users can update
+    const isOwner = task.owner.toString() === req.user.userId;
+    const isAssignedUser = task.assignedTo.includes(req.user.userId);
+    if (!isOwner && !isAssignedUser) {
       return res.ForBidden({}, "You are not authorized to update this task");
     }
 
+    // Validate multiple assignees
+    if (assignedTo && assignedTo.length > 0) {
+      const users = await User.find({ _id: { $in: assignedTo } });
+      if (users.length !== assignedTo.length) {
+        return res.NotFound({ message: "One or more assigned users not found" });
+      }
+    }
+
+    // Update task
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
       {
@@ -85,6 +103,7 @@ exports.updateTask = async (req, res) => {
           status: status || task.status,
           priority: priority || task.priority,
           assignedTo: assignedTo || task.assignedTo,
+          dueDate: dueDate || task.dueDate, // Update due date
         },
       },
       { new: true }
@@ -99,6 +118,7 @@ exports.updateTask = async (req, res) => {
   }
 };
 
+// Delete Task Controller
 exports.deleteTask = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -108,10 +128,8 @@ exports.deleteTask = async (req, res) => {
       return res.NotFound({}, "Task not found");
     }
 
-    if (
-      task.owner.toString() !== req.user.userId &&
-      req.user.role !== "admin"
-    ) {
+    // Authorization: only owner or admin can delete
+    if (task.owner.toString() !== req.user.userId && req.user.role !== "admin") {
       return res.Forbidden({}, "You are not authorized to delete this task");
     }
 

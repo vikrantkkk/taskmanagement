@@ -10,6 +10,7 @@ const {
   resetPassword,
   deleteUser,
   logoutUser,
+  getAllUsers,
 } = require("../controllers/userController");
 const { upload } = require("../middlewares/uploadFileMiddleware"); // Make sure this path is correct
 const authMiddleware = require("../middlewares/authMiddleware");
@@ -21,6 +22,7 @@ router.post("/register", upload.single("images"), registerUser);
 router.post("/verify-otp", authMiddleware, verifyOtp);
 router.post("/login", loginUser);
 router.get("/get-user-profile", authMiddleware, getUserProfile);
+router.get("/get-all-user", getAllUsers);
 router.put(
   "/update-user-profile",
   authMiddleware,

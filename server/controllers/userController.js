@@ -207,6 +207,18 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
+// Get All Users (for the frontend to fetch users and display names)
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.Ok(users, "Users fetched successfully");
+  } catch (error) {
+    console.error(error);
+    res.InternalError({}, "Internal server error");
+  }
+};
+
+
 exports.updateUserProfile = async (req, res) => {
   try {
     const { userId } = req.user;

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const taskShema = new mongoose.Schema(
+const taskSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -24,10 +24,27 @@ const taskShema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    // Modify `assignedTo` to handle multiple assignees
+    assignedTo: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+    ],
+    // Add a due date for the task
+    dueDate: {
+      type: Date,
+      required: true,
+    },
+    // Add fields for overdue and reminders
+    isOverdue: {
+      type: Boolean,
+      default: false,
+    },
+    reminderSent: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-const Task = mongoose.model("Task", taskShema);
+const Task = mongoose.model("Task", taskSchema);
 module.exports = Task;
