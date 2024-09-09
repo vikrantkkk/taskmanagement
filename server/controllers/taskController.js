@@ -22,6 +22,15 @@ exports.createTask = async (req, res) => {
       owner: req.user.userId,
       assignedTo: assignedTo || null,
     });
+
+    const io = req.app.get("io");
+    io.emit("newTaskNotification", { 
+      message: `Task "${newTask.title}" has been created!`,
+      taskId: newTask._id,
+      timestamp: new Date()
+    });
+    
+
     const newTaskData = JSON.parse(JSON.stringify(newTask));
     return res.Create(newTaskData, "Task created successfully");
   } catch (error) {

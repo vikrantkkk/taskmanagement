@@ -8,8 +8,24 @@ import TaskList from "./components/TaskList";
 import InProgressTaskList from "./pages/InProgressTaskList";
 import CompletedTaskList from "./pages/CompletedTaskList";
 import Setting from "./pages/Setting";
+import { useEffect, useMemo } from "react";
+import io from "socket.io-client";
 
+const socket = io("http://localhost:5000");
 const App = () => {
+  useEffect(() => {
+    // Listen for new task creation events
+    socket.on("newTaskCreated", (task) => {
+      console.log("New task created:", task);
+      // Optionally update your task list here
+    });
+
+    // Cleanup the listener when the component unmounts
+    return () => {
+      socket.off("newTaskCreated");
+    };
+  }, []);
+
   return (
     <Router>
       <Routes>
