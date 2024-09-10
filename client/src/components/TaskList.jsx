@@ -31,7 +31,6 @@ import { useDispatch } from "react-redux";
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
-  console.log("🚀 ~ TaskList ~ filteredTasks:", filteredTasks);
   const [expandedTaskId, setExpandedTaskId] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -51,7 +50,6 @@ const TaskList = () => {
   const dispatch = useDispatch();
 
   const { data, isLoading,refetch } = useGetUserTasksQuery();
-  // console.log("🚀 ~ TaskList ~ data:", data?.data)
 
   useEffect(() => {
     const fetchTasks = async () => {

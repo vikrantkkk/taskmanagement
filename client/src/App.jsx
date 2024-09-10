@@ -10,6 +10,7 @@ import CompletedTaskList from "./pages/CompletedTaskList";
 import Setting from "./pages/Setting";
 import './app.css'
 import PendingTask from "./pages/PendingTask";
+import MyAccountProfile from "./pages/MyAccountProfile";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="inprogress-task" element={<InProgressTaskList />} />
           <Route path="completed-task" element={<CompletedTaskList />} />
           <Route path="setting" element={<Setting />} />
+          <Route path="my-account" element={<MyAccountProfile />} />
           <Route index element={<Dashboard />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />

@@ -66,7 +66,6 @@ const Register = () => {
     const { confirmPassword, ...payload } = data; // Exclude confirmPassword from the payload
     try {
       const response = await registerMutation(payload).unwrap();
-      console.log("🚀 ~ onSubmit ~ response:", response)
       enqueueSnackbar(response?.message, { variant: "success" });
       // Save user info and token to the store
       dispatch(register(response));

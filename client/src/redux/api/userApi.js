@@ -11,7 +11,7 @@ export const authApi = createApi({
     baseUrl: BASE_URL,
     prepareHeaders: (headers, { getState }) => {
       // Get the token from the state (if available) and set the Authorization header
-      const {token} = getState().auth.user; // Adjust according to your state structure
+      const token = localStorage.getItem("token")
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
@@ -43,8 +43,15 @@ export const authApi = createApi({
         body: otpData,
       }),
     }),
+    updateUserProfile: builder.mutation({
+      query: (userData) => ({
+        url: "update-user-profile",
+        method: "PUT",
+        body: userData,
+      }),
+    }),
   }),
 });
 
 // Export hooks for the defined mutations
-export const { useRegisterMutation, useLoginMutation, useVerifyOtpMutation } = authApi;
+export const { useRegisterMutation, useLoginMutation, useVerifyOtpMutation,useUpdateUserProfileMutation } = authApi;

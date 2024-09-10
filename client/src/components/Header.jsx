@@ -7,13 +7,20 @@ import {
   MenuItem,
   MenuList,
   ListItemText,
-  ListItem,
+  Typography,
+  Divider,
+  Avatar,
 } from "@mui/material";
-import { Notifications, AccountCircle } from "@mui/icons-material";
+import {
+  Notifications,
+  AccountCircle,
+  Person2Outlined,
+} from "@mui/icons-material";
 import CreateTaskDialog from "./CreateTaskDialog";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import io from "socket.io-client"; // Import socket.io-client
+import { useSelector } from "react-redux";
 
 const socket = io("http://localhost:5000"); // Connect to your backend socket
 
@@ -24,6 +31,8 @@ const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
   const navigate = useNavigate();
+
+  const res = useSelector((state) => state.auth.user);
 
   // Open the "Create Task" dialog
   const handleOpenCreateTaskDialog = () => {
@@ -115,9 +124,14 @@ const Header = () => {
           </Badge>
         </IconButton>
 
-        <IconButton sx={{ color: "gray" }} onClick={handleOpenProfileMenu}>
-          <AccountCircle fontSize="large" />
-        </IconButton>
+        <Avatar
+          onClick={handleOpenProfileMenu}
+          alt={res?.name || "User"}
+          src={res?.profilePic || res?.user?.profilePic}
+          sx={{ cursor: "pointer", width: 40, height: 40 }}
+        >
+          {!res && <AccountCircle fontSize="inherit" />}
+        </Avatar>
       </div>
 
       <CreateTaskDialog
@@ -174,7 +188,12 @@ const Header = () => {
       >
         <div className="p-2">
           <MenuList>
-            <MenuItem onClick={() => navigate("/dashboard/setting")}>
+            <Typography color="gray" mb={1}>
+              {" "}
+              <Person2Outlined /> {res?.user?.name || res?.name}
+            </Typography>
+            <Divider />
+            <MenuItem onClick={() => navigate("/dashboard/my-account")}>
               Profile
             </MenuItem>
             <MenuItem onClick={() => navigate("/dashboard/setting")}>

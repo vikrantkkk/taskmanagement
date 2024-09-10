@@ -225,6 +225,7 @@ exports.updateUserProfile = async (req, res) => {
     const { name, email } = req.body;
 
     const imageLocalPath = req.file?.path;
+    console.log("🚀 ~ exports.updateUserProfile= ~ imageLocalPath:", imageLocalPath)
 
     let imageUrl = null;
 

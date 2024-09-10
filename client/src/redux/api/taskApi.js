@@ -10,7 +10,6 @@ export const taskApi = createApi({
     baseUrl: BASE_URL,
     prepareHeaders: (headers, { getState }) => {
       const token = localStorage.getItem("token");
-      console.log("🚀 ~ token:", token);
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }

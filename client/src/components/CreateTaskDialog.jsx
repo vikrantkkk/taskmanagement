@@ -82,7 +82,6 @@ const CreateTaskDialog = ({ open, handleClose }) => {
         assignedTo: data?.assignedTo?.map((user) => user?.value) || null,
       };
       const response = await createTask(taskData).unwrap();
-      console.log("🚀 ~ onSubmit ~ response:", response);
       enqueueSnackbar(response?.message, { variant: "success" });
       dispatch(addTask(response));
       refetch();
