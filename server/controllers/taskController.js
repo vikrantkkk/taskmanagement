@@ -53,8 +53,8 @@ exports.getUserTask = async (req, res) => {
     const tasks = await Task.find({
       $or: [{ owner: userId }, { assignedTo: { $in: [userId] } }]
     })
-      .populate("owner", "firstName lastName")
-      .populate("assignedTo", "firstName lastName");
+      .populate("owner", "name")
+      .populate("assignedTo", "name");
 
     if (!tasks.length) {
       return res.NotFound({}, "No tasks found for the user");

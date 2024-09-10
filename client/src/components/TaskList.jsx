@@ -24,10 +24,14 @@ import EditTaskDialog from "./EditTaskModal";
 import DeleteTaskDialog from "./DeleteTaskModal";
 import moment from "moment";
 import { useSnackbar } from "notistack";
+import { useGetUserTasksQuery } from "../redux/api/taskApi";
+import { setUserTasks } from "../redux/taskSlice";
+import { useDispatch } from "react-redux";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
+  console.log("🚀 ~ TaskList ~ filteredTasks:", filteredTasks);
   const [expandedTaskId, setExpandedTaskId] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -40,35 +44,26 @@ const TaskList = () => {
     assignedTo: "",
   });
   const [loading, setLoading] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null); // for menu
-  const [selectedPriority, setSelectedPriority] = useState(""); // for priority filter
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedPriority, setSelectedPriority] = useState("");
   const { enqueueSnackbar } = useSnackbar();
   const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId"); // Assume user ID is stored in localStorage
+  const dispatch = useDispatch();
+
+  const { data, isLoading,refetch } = useGetUserTasksQuery();
+  // console.log("🚀 ~ TaskList ~ data:", data?.data)
 
   useEffect(() => {
     const fetchTasks = async () => {
-      setLoading(true);
-      try {
-        const { data } = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/task/get-user-task`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setTasks(data.data);
-        setFilteredTasks(data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+      if (data) {
+        const res = await dispatch(setUserTasks(data?.data));
+        setTasks(res?.payload);
+        setFilteredTasks(res?.payload);
       }
     };
 
     fetchTasks();
-  }, [token]);
+  }, [data, dispatch]);
 
   useEffect(() => {
     if (selectedPriority === "") {
@@ -123,13 +118,13 @@ const TaskList = () => {
       assignedTo: task.assignedTo?._id || "",
     });
     setEditDialogOpen(true);
-    setAnchorEl(null); // Close the menu when editing
+    setAnchorEl(null);
   };
 
   const openDeleteDialog = (task) => {
     setSelectedTask(task);
     setDeleteDialogOpen(true);
-    setAnchorEl(null); // Close the menu when deleting
+    setAnchorEl(null);
   };
 
   const handleEditSubmit = async () => {
@@ -147,6 +142,7 @@ const TaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
+      refetch()
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task._id === selectedTask._id ? { ...task, ...formData } : task
@@ -174,6 +170,7 @@ const TaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
+      refetch()
       setTasks((prevTasks) =>
         prevTasks.filter((task) => task._id !== selectedTask._id)
       );
@@ -247,6 +244,21 @@ const TaskList = () => {
                 >
                   {task.title}
                 </Typography>
+                {task?.description && (
+                  <Typography
+                    sx={{
+                      overflowX: "auto",
+                      scrollbarWidth: "none",
+                      "&::-webkit-scrollbar": {
+                        display: "none",
+                      },
+                    }}
+                    variant="body2"
+                    gutterBottom
+                  >
+                    {task?.description}
+                  </Typography>
+                )}
 
                 <Chip
                   icon={<PriorityHighIcon />}
@@ -263,14 +275,23 @@ const TaskList = () => {
                 >
                   Status: {task.status}
                 </Typography>
-
-                {task.assignedTo?._id !== userId && (
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  className="mt-2"
+                >
+                  Owner: {task?.owner?.name}
+                </Typography>
+                {task.assignedTo && task.assignedTo.length > 0 && (
                   <Typography
                     variant="body2"
                     color="text.primary"
                     className="mt-2"
                   >
-                    Assigned By: {task.assignedBy?.name || ""}
+                    Assigned To:{" "}
+                    {task.assignedTo
+                      .map((assignee) => assignee.name)
+                      .join(", ")}
                   </Typography>
                 )}
 
@@ -301,13 +322,24 @@ const TaskList = () => {
                   timeout="auto"
                   unmountOnExit
                 >
-                  <Typography variant="body2" paragraph color="text.primary">
-                    {task.description}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Created On:{" "}
-                    {moment(task.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "5px",
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Created On:{" "}
+                      {moment(task.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Due Date:{" "}
+                      {moment(task.dueDate).format("MMMM Do YYYY, h:mm:ss a")}
+                    </Typography>
+                  </Box>
                 </Collapse>
               </CardContent>
 
@@ -330,7 +362,7 @@ const TaskList = () => {
         <EditTaskDialog
           open={editDialogOpen}
           handleClose={() => setEditDialogOpen(false)}
-          handleSubmit={handleEditSubmit}
+          handleEditSubmit={handleEditSubmit}
           formData={formData}
           setFormData={setFormData}
         />
@@ -356,6 +388,7 @@ const TaskList = () => {
           Delete
         </MenuItem>
       </Menu>
+      {isLoading && <CircularProgress />}
     </div>
   );
 };

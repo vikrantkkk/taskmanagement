@@ -5,6 +5,7 @@ import {
   HourglassEmpty,
   CheckCircle,
   Settings,
+  PendingActions,
 } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
 import SingleStoreIcon from "../assets/icons/SingleStoreIcon"; // Update this path if needed
@@ -51,17 +52,6 @@ const Sidebar = () => {
             </Link>
           </li>
 
-          {/* In Progress */}
-          <li className="flex items-center rounded-lg p-2">
-            <Link
-              to="/dashboard/inprogress-task"
-              className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/inprogress-task" ? activeClassName : inactiveClassName}`}
-            >
-              <HourglassEmpty fontSize="small" />
-              <Typography>In Progress</Typography>
-            </Link>
-          </li>
-
           {/* Completed */}
           <li className="flex items-center rounded-lg p-2">
             <Link
@@ -69,10 +59,34 @@ const Sidebar = () => {
               className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/completed-task" ? activeClassName : inactiveClassName}`}
             >
               <CheckCircle fontSize="small" />
-              <Typography>Completed</Typography>
+              <Typography>Completed Task</Typography>
             </Link>
           </li>
 
+
+          {/* In Progress */}
+          <li className="flex items-center rounded-lg p-2">
+            <Link
+              to="/dashboard/inprogress-task"
+              className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/inprogress-task" ? activeClassName : inactiveClassName}`}
+            >
+              <HourglassEmpty fontSize="small" />
+              <Typography>InProgress Taks</Typography>
+            </Link>
+          </li>
+
+
+          {/* In Pending */}
+          <li className="flex items-center rounded-lg p-2">
+            <Link
+              to="/dashboard/pending-task"
+              className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/pending-task" ? activeClassName : inactiveClassName}`}
+            >
+               <PendingActions fontSize="small" />
+              <Typography>Pending task</Typography>
+            </Link>
+          </li>
+          
           {/* Settings */}
           <li className="flex items-center rounded-lg p-2">
             <Link

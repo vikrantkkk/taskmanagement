@@ -93,7 +93,7 @@ const EditTaskDialog = ({
             <MenuItem key={assignee._id} value={assignee._id}>
               {assignee?.name}
             </MenuItem>
-          )) || null} 
+          )) || null}
         </TextField>
       </DialogContent>
 

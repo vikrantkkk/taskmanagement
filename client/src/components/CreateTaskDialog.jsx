@@ -17,6 +17,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
 import { useSnackbar } from "notistack";
+import {
+  useCreateTaskMutation,
+  useGetUserTasksQuery,
+} from "../redux/api/taskApi";
+import { addTask } from "../redux/taskSlice";
+import { useDispatch } from "react-redux";
 
 // Validation schema
 const schema = yup.object().shape({
@@ -27,18 +33,22 @@ const schema = yup.object().shape({
 const CreateTaskDialog = ({ open, handleClose }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [users, setUsers] = useState([]);
+  const [createTask] = useCreateTaskMutation();
+  const dispatch = useDispatch();
 
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
-    reset
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
   });
 
   const token = localStorage.getItem("token");
+
+  const { refetch } = useGetUserTasksQuery();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -67,23 +77,20 @@ const CreateTaskDialog = ({ open, handleClose }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/task/create-task`,
-        {
-          ...data,
-          assignedTo: data?.assignedTo?.map((user) => user?.value) || null,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      enqueueSnackbar(response?.data?.message, { variant: "success" });
+      const taskData = {
+        ...data,
+        assignedTo: data?.assignedTo?.map((user) => user?.value) || null,
+      };
+      const response = await createTask(taskData).unwrap();
+      console.log("🚀 ~ onSubmit ~ response:", response);
+      enqueueSnackbar(response?.message, { variant: "success" });
+      dispatch(addTask(response));
+      refetch();
       reset();
       handleClose();
     } catch (error) {
       console.log(error);
+      // Handle error
     }
   };
 

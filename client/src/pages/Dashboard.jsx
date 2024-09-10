@@ -1,5 +1,6 @@
 import React from "react";
 import ReactApexChart from "react-apexcharts";
+import { useDispatch, useSelector } from "react-redux";
 
 // Example card component
 const DashboardCard = ({ title, value }) => {
@@ -17,29 +18,88 @@ const DashboardCard = ({ title, value }) => {
 };
 
 const Dashboard = () => {
+  const { tasks } = useSelector((state) => state.task);
+
+  // Calculate summary values
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(
+    (task) => task.status === "completed"
+  ).length;
+  const pendingTasks = tasks.filter((task) => task.status === "pending").length;
+  const inProgressTasks = tasks.filter((task) => task.status === "inprogress").length;
+  const teamMembers = Array.from(
+    new Set(tasks.map((task) => task.owner.name))
+  ).length;
+
   // Line chart data
   const lineChartOptions = {
     chart: {
       type: "line",
+      height: 300,
+      toolbar: {
+        show: false,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: "smooth",
+    },
+    xaxis: {
+      categories: tasks.reduce((acc, task) => {
+        const monthYear = new Date(task.dueDate).toLocaleString("default", { year: "numeric", month: "short" });
+        if (!acc.includes(monthYear)) acc.push(monthYear);
+        return acc;
+      }, []),
+      title: {
+        text: "Month",
+        style: {
+          fontSize: '14px',
+          color: '#7C8D9C',
+        },
+      },
+    },
+    yaxis: {
+      title: {
+        text: "Tasks Completed",
+        style: {
+          fontSize: '14px',
+          color: '#7C8D9C',
+        },
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: (val) => `${val} tasks`,
+      },
     },
     series: [
       {
         name: "Tasks Completed",
-        data: [10, 41, 35, 51, 49, 62, 69, 91, 148],
+        data: tasks.reduce((acc, task) => {
+          const monthYear = new Date(task.dueDate).toLocaleString("default", { year: "numeric", month: "short" });
+          const monthIndex = acc.findIndex(item => item.month === monthYear);
+          if (monthIndex > -1) {
+            acc[monthIndex].value += task.status === "completed" ? 1 : 0;
+          } else {
+            acc.push({ month: monthYear, value: task.status === "completed" ? 1 : 0 });
+          }
+          return acc;
+        }, []).map(item => item.value),
       },
     ],
-    xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-      ],
+    colors: ["#FF1654"],
+    grid: {
+      borderColor: '#e0e0e0',
+    },
+    title: {
+      text: "Task Completion Over Time",
+      align: 'left',
+      style: {
+        fontSize: '18px',
+        color: '#333',
+      },
     },
   };
 
@@ -48,8 +108,12 @@ const Dashboard = () => {
     chart: {
       type: "pie",
     },
-    series: [44, 55, 13, 43],
-    labels: ["To Do", "In Progress", "Done", "Blocked"],
+    series: [
+      tasks.filter((task) => task.status === "pending").length,
+      tasks.filter((task) => task.status === "inprogress").length,
+      tasks.filter((task) => task.status === "completed").length,
+    ],
+    labels: ["Pending", "In Progress", "Completed"],
   };
 
   // Donut chart data (poll results)
@@ -57,7 +121,11 @@ const Dashboard = () => {
     chart: {
       type: "donut",
     },
-    series: [35, 25, 40],
+    series: [
+      tasks.filter((task) => task.priority === "high").length,
+      tasks.filter((task) => task.priority === "medium").length,
+      tasks.filter((task) => task.priority === "low").length,
+    ],
     labels: ["High Priority", "Medium Priority", "Low Priority"],
   };
 
@@ -67,13 +135,13 @@ const Dashboard = () => {
       <h1 className="text-4xl font-bold text-gray-700 mb-8 text-center">
         Task Management Dashboard
       </h1>
-  
+
       {/* Top Row - Summary Cards */}
       <div className="flex mb-8">
-        <DashboardCard title="Total Tasks" value="256" />
-        <DashboardCard title="Completed Tasks" value="198" />
-        <DashboardCard title="Pending Tasks" value="58" />
-        <DashboardCard title="Team Members" value="24" />
+        <DashboardCard title="Total Tasks" value={totalTasks} />
+        <DashboardCard title="Completed Tasks" value={completedTasks} />
+        <DashboardCard title="Pending Tasks" value={pendingTasks} />
+        <DashboardCard title="In Progress Tasks" value={inProgressTasks} />
       </div>
 
       {/* Middle Row - Line and Pie Charts */}
