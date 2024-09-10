@@ -203,11 +203,7 @@ const TaskList = () => {
   return (
     <div className="">
       <Box sx={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
-        <FormControl
-          fullWidth
-          margin="normal"
-          sx={{ width: "10rem"}}
-        >
+        <FormControl fullWidth margin="normal" sx={{ width: "10rem" }}>
           <InputLabel id="priority-filter-label">Filter by Priority</InputLabel>
           <Select
             labelId="priority-filter-label"
@@ -359,7 +355,7 @@ const TaskList = () => {
         <MenuItem onClick={() => openDeleteDialog(selectedTask)}>
           Delete
         </MenuItem>
-      </Menu> 
+      </Menu>
     </div>
   );
 };
