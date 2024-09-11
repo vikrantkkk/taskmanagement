@@ -53,7 +53,6 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       const response = await loginMutation(data).unwrap();
-      console.log("🚀 ~ onSubmit ~ response:", response);
       enqueueSnackbar(response?.message, { variant: "success" });
       localStorage.setItem("userId", response?.data?._id);
       dispatch(login(response));

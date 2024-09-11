@@ -12,17 +12,16 @@ const MyAccountProfile = () => {
   const [email, setEmail] = useState(user?.email || user?.user?.email || "");
   const [profilePicFile, setProfilePicFile] = useState(null);
 
- 
   const [updateUserProfileMutation] = useUpdateUserProfileMutation();
   const dispatch = useDispatch();
+
 
   const handleProfilePicChange = (e) => {
     const file = e.target.files[0];
 
     if (file) {
       if (file.size > 1 * 1024 * 1024) {
-      
-        alert("File size exceeds 5MB");
+        alert("File size exceeds 1MB");
         return;
       }
 
@@ -31,6 +30,7 @@ const MyAccountProfile = () => {
         return;
       }
 
+    
       setProfileImage(URL.createObjectURL(file));
       setProfilePicFile(file);
     }
@@ -46,7 +46,6 @@ const MyAccountProfile = () => {
         formData.append("images", profilePicFile);
       }
 
- 
       const response = await updateUserProfileMutation(formData).unwrap();
       dispatch(updateUserProfile(response));
       console.log("Profile updated successfully:", response);
@@ -65,13 +64,15 @@ const MyAccountProfile = () => {
             alt="Profile"
             className="w-32 h-32 object-cover rounded-full border border-gray-300"
           />
+      
           <input
             type="file"
             accept="image/*"
             className="mt-2"
             id="profilePicInput"
             disabled={false} 
-            style={{ display: "none" }}
+            style={{ display: "none" }} 
+            onChange={handleProfilePicChange} 
           />
           <label
             htmlFor="profilePicInput"

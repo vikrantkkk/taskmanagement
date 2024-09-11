@@ -57,6 +57,7 @@ const VerifyOtp = () => {
   const onSubmit = async (data) => {
     try {
       const response = await verifyOtpMutation({ otp: data.otp }).unwrap();
+      localStorage.setItem("isVerified", response?.data?.user?.isVerified);
       enqueueSnackbar(response?.message, { variant: "success" });
       dispatch(verifyOtp(response));
       if (response?.success) {

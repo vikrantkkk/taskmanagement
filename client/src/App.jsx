@@ -12,15 +12,25 @@ import "./app.css";
 import PendingTask from "./pages/PendingTask";
 import MyAccountProfile from "./pages/MyAccountProfile";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ProtectedRoute from "./components/ProtectedRoute"; 
 
 const App = () => {
+  const isVerified = localStorage.getItem("isVerified"); 
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={<AuthPage />} />
         <Route path="/verifyotp" element={<VerifyOtp />} />
-        <Route path="forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/dashboard" element={<AppLayout />}>
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route 
+          path="/dashboard"
+          element={
+            <ProtectedRoute isVerified={isVerified}>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="tasks" element={<TaskList />} />
           <Route path="pending-task" element={<PendingTask />} />
           <Route path="inprogress-task" element={<InProgressTaskList />} />
