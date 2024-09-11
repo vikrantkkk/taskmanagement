@@ -19,11 +19,11 @@ import {
 import CreateTaskDialog from "./CreateTaskDialog";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import io from "socket.io-client"; // Import socket.io-client
+import io from "socket.io-client"; 
 import { useSelector } from "react-redux";
 import TemporaryDrawer from "./TemporaryDrawer";
 
-const socket = io("http://localhost:5000"); // Connect to your backend socket
+const socket = io("http://localhost:5000");
 
 const Header = () => {
   const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
@@ -35,37 +35,37 @@ const Header = () => {
 
   const res = useSelector((state) => state.auth.user);
 
-  // Open the "Create Task" dialog
+
   const handleOpenCreateTaskDialog = () => {
     setOpenCreateTaskDialog(true);
   };
 
-  // Close the "Create Task" dialog
+ 
   const handleCloseCreateTaskDialog = () => {
     setOpenCreateTaskDialog(false);
   };
 
-  // Open the profile menu
+
   const handleOpenProfileMenu = (event) => {
     setProfileMenuAnchorEl(event.currentTarget);
   };
 
-  // Close the profile menu
+
   const handleCloseProfileMenu = () => {
     setProfileMenuAnchorEl(null);
   };
 
-  // Open the notifications popover
+ 
   const handleNotificationClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // Close the notifications popover
+
   const handleCloseNotificationMenu = () => {
     setAnchorEl(null);
   };
 
-  // Mark a notification as read
+ 
   const markAsRead = (index) => {
     const updatedNotifications = [...notifications];
     updatedNotifications.splice(index, 1);
@@ -74,7 +74,7 @@ const Header = () => {
     handleCloseNotificationMenu();
   };
 
-  // Logout handler
+
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/logout`);
@@ -85,7 +85,7 @@ const Header = () => {
     }
   };
 
-  // Listen for task notifications via socket.io
+ 
   useEffect(() => {
     socket.on("newTaskNotification", (notification) => {
       setNotifications((prevNotifications) => [
@@ -96,7 +96,7 @@ const Header = () => {
     });
 
     return () => {
-      socket.off("newTaskNotification"); // Clean up on unmount
+      socket.off("newTaskNotification"); 
     };
   }, []);
 

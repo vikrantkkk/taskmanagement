@@ -185,7 +185,7 @@ const TaskList = () => {
     }
   };
 
-  // Menu handlers
+
   const handleMenuClick = (event, task) => {
     setSelectedTask(task);
     setAnchorEl(event.currentTarget);

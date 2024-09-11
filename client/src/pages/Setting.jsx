@@ -10,7 +10,7 @@ import { resetTasks } from '../redux/taskSlice';
 import { resetUser } from '../redux/userSlice';
 import { useDispatch } from "react-redux";
 
-// Define validation schema with Yup
+
 const schema = Yup.object().shape({
   currentPassword: Yup.string().required("Current password is required"),
   newPassword: Yup.string()
@@ -31,7 +31,7 @@ const SettingsPage = () => {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  // Initialize React Hook Form
+ 
   const {
     control,
     handleSubmit,
@@ -63,7 +63,7 @@ const SettingsPage = () => {
         enqueueSnackbar("Password updated successfully", {
           variant: "success",
         });
-        reset(); // Reset form fields
+        reset(); 
       } else {
         const result = await response.json();
         enqueueSnackbar(result.message || "Failed to update password", {
@@ -80,7 +80,7 @@ const SettingsPage = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      const userId = localStorage.getItem("userId"); // Replace with the actual user ID or obtain it dynamically
+      const userId = localStorage.getItem("userId"); 
       const response = await fetch(
         `http://localhost:5000/api/v1/user/delete-user/${userId}`,
         {
@@ -93,7 +93,7 @@ const SettingsPage = () => {
 
       if (response.ok) {
         enqueueSnackbar("Account deleted successfully", { variant: "success" });
-        // Optionally redirect the user or perform other actions
+       
         navigate("/");
         dispatch(resetTasks())
         dispatch(resetUser())

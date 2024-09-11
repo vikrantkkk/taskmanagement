@@ -113,7 +113,7 @@ const Dashboard = () => {
     },
   };
 
-  // Pie chart data
+
   const pieChartOptions = {
     chart: {
       type: "pie",

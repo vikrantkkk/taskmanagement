@@ -24,7 +24,6 @@ import {
 import { addTask } from "../redux/taskSlice";
 import { useDispatch } from "react-redux";
 
-// Validation schema
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
   dueDate: yup.date().required("Due date is required"),
@@ -64,7 +63,7 @@ const CreateTaskDialog = ({ open, handleClose }) => {
         setUsers(
           data.data.map((user) => ({
             value: user._id,
-            label: user.name, // Adjust according to the user data structure
+            label: user.name,
           }))
         );
       } catch (error) {
@@ -89,16 +88,21 @@ const CreateTaskDialog = ({ open, handleClose }) => {
       handleClose();
     } catch (error) {
       console.log(error);
-      // Handle error
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      sx={{
+        height: "90%",
+        margin: "4rem 0 0 0",
+      }}
+    >
       <DialogTitle>Create New Task</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-          {/* Title */}
           <Controller
             name="title"
             control={control}
@@ -116,7 +120,6 @@ const CreateTaskDialog = ({ open, handleClose }) => {
             )}
           />
 
-          {/* Description */}
           <Controller
             name="description"
             control={control}
@@ -138,7 +141,6 @@ const CreateTaskDialog = ({ open, handleClose }) => {
             )}
           />
 
-          {/* Status */}
           <FormControl
             fullWidth
             margin="dense"
@@ -159,7 +161,6 @@ const CreateTaskDialog = ({ open, handleClose }) => {
             />
           </FormControl>
 
-          {/* Priority */}
           <FormControl
             fullWidth
             margin="dense"
@@ -180,7 +181,6 @@ const CreateTaskDialog = ({ open, handleClose }) => {
             />
           </FormControl>
 
-          {/* Due Date */}
           <Controller
             name="dueDate"
             control={control}
@@ -200,7 +200,6 @@ const CreateTaskDialog = ({ open, handleClose }) => {
             )}
           />
 
-          {/* Assigned To */}
           <Controller
             name="assignedTo"
             control={control}
@@ -229,13 +228,28 @@ const CreateTaskDialog = ({ open, handleClose }) => {
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary" variant="outlined">
+        <Button
+          onClick={handleClose}
+          sx={{
+            borderColor: "#673AB7",
+            color: "#673AB7",
+            "&:hover": { borderColor: "#673AB7", backgroundColor: "#EDE7F6" },
+          }}
+          color="primary"
+          variant="outlined"
+        >
           Cancel
         </Button>
         <Button
           onClick={handleSubmit(onSubmit)}
           color="primary"
           variant="contained"
+          sx={{
+            backgroundColor: "#673AB7",
+            "&:hover": {
+              backgroundColor: "#5e35b1",
+            },
+          }}
         >
           Create Task
         </Button>

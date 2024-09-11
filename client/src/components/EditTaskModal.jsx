@@ -28,7 +28,7 @@ const EditTaskDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} sx={{height:"90%",margin:"4rem 0 0 0"}}>
       <DialogTitle>Edit Task</DialogTitle>
       <DialogContent>
         <TextField
@@ -98,10 +98,28 @@ const EditTaskDialog = ({
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={handleClose} disabled={loading}>
+        <Button
+          onClick={handleClose}
+          sx={{
+            borderColor: "#673AB7",
+            color: "#673AB7",
+            "&:hover": { borderColor: "#673AB7", backgroundColor: "#EDE7F6" },
+          }}
+          disabled={loading}
+        >
           Cancel
         </Button>
-        <Button onClick={handleEditSubmit} disabled={loading}>
+        <Button
+          onClick={handleEditSubmit}
+          sx={{
+            backgroundColor: "#673AB7",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "#5e35b1",
+            },
+          }}
+          disabled={loading}
+        >
           {loading ? <CircularProgress size={24} /> : "Save Changes"}
         </Button>
       </DialogActions>

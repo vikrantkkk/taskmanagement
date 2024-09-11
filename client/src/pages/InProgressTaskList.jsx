@@ -16,7 +16,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import axios from "axios";
-import moment from "moment"; // Import moment.js for date formatting
+import moment from "moment"; 
 import { useSnackbar } from "notistack";
 import EditTaskDialog from "../components/EditTaskModal";
 import DeleteTaskDialog from "../components/DeleteTaskModal";
@@ -35,7 +35,7 @@ const InProgressTaskList = () => {
     assignedTo: "",
   });
   const [loading, setLoading] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null); // for menu
+  const [anchorEl, setAnchorEl] = useState(null); 
   const { enqueueSnackbar } = useSnackbar();
   const token = localStorage.getItem("token");
 
@@ -50,7 +50,7 @@ const InProgressTaskList = () => {
             },
           }
         );
-        setTasks(data.data.filter(task => task.status.toLowerCase() === "inprogress")); // Filter tasks
+        setTasks(data.data.filter(task => task.status.toLowerCase() === "inprogress"));
       } catch (err) {
         console.error(err);
       }
@@ -99,13 +99,13 @@ const InProgressTaskList = () => {
       assignedTo: task.assignedTo?._id || "",
     });
     setEditDialogOpen(true);
-    setAnchorEl(null); // Close the menu when editing
+    setAnchorEl(null); 
   };
 
   const openDeleteDialog = (task) => {
     setSelectedTask(task);
     setDeleteDialogOpen(true);
-    setAnchorEl(null); // Close the menu when deleting
+    setAnchorEl(null); 
   };
 
   const handleEditSubmit = async () => {
@@ -166,7 +166,7 @@ const InProgressTaskList = () => {
     }
   };
 
-  // Menu handlers
+  
   const handleMenuClick = (event, task) => {
     setSelectedTask(task);
     setAnchorEl(event.currentTarget);
@@ -268,7 +268,7 @@ const InProgressTaskList = () => {
             </IconButton>
           </CardContent>
 
-          {/* Menu for Edit/Delete */}
+     
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
@@ -284,7 +284,6 @@ const InProgressTaskList = () => {
         </Card>
       ))}
 
-      {/* Edit Task Dialog */}
       <EditTaskDialog
         open={editDialogOpen}
         handleClose={() => setEditDialogOpen(false)}
@@ -294,7 +293,7 @@ const InProgressTaskList = () => {
         loading={loading}
       />
 
-      {/* Delete Task Dialog */}
+
       <DeleteTaskDialog
         open={deleteDialogOpen}
         handleClose={() => setDeleteDialogOpen(false)}

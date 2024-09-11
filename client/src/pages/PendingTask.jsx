@@ -16,7 +16,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import axios from "axios";
-import moment from "moment"; // Import moment.js for date formatting
+import moment from "moment"; 
 import { useSnackbar } from "notistack";
 import EditTaskDialog from "../components/EditTaskModal";
 import DeleteTaskDialog from "../components/DeleteTaskModal";
@@ -35,7 +35,7 @@ const PendingTask = () => {
     assignedTo: "",
   });
   const [loading, setLoading] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null); // for menu
+  const [anchorEl, setAnchorEl] = useState(null); 
   const { enqueueSnackbar } = useSnackbar();
   const token = localStorage.getItem("token");
 
@@ -99,13 +99,13 @@ const PendingTask = () => {
       assignedTo: task.assignedTo?._id || "",
     });
     setEditDialogOpen(true);
-    setAnchorEl(null); // Close the menu when editing
+    setAnchorEl(null);
   };
 
   const openDeleteDialog = (task) => {
     setSelectedTask(task);
     setDeleteDialogOpen(true);
-    setAnchorEl(null); // Close the menu when deleting
+    setAnchorEl(null);
   };
 
   const handleEditSubmit = async () => {
@@ -166,7 +166,7 @@ const PendingTask = () => {
     }
   };
 
-  // Menu handlers
+  
   const handleMenuClick = (event, task) => {
     setSelectedTask(task);
     setAnchorEl(event.currentTarget);

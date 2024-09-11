@@ -16,10 +16,11 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import axios from "axios";
-import moment from "moment"; // Import moment.js for date formatting
+import moment from "moment";
 import { useSnackbar } from "notistack";
 import EditTaskDialog from "../components/EditTaskModal";
 import DeleteTaskDialog from "../components/DeleteTaskModal";
+import { useGetUserTasksQuery } from "../redux/api/taskApi";
 
 const CompletedTaskList = () => {
   const [tasks, setTasks] = useState([]);
@@ -35,7 +36,7 @@ const CompletedTaskList = () => {
     assignedTo: "",
   });
   const [loading, setLoading] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null); // for menu
+  const [anchorEl, setAnchorEl] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
   const token = localStorage.getItem("token");
 
@@ -50,8 +51,10 @@ const CompletedTaskList = () => {
             },
           }
         );
-        // Filter tasks based on status
-        setTasks(data.data.filter(task => task.status.toLowerCase() === 'completed'));
+
+        setTasks(
+          data.data.filter((task) => task.status.toLowerCase() === "completed")
+        );
       } catch (err) {
         console.error(err);
       }
@@ -100,13 +103,13 @@ const CompletedTaskList = () => {
       assignedTo: task.assignedTo?._id || "",
     });
     setEditDialogOpen(true);
-    setAnchorEl(null); // Close the menu when editing
+    setAnchorEl(null);
   };
 
   const openDeleteDialog = (task) => {
     setSelectedTask(task);
     setDeleteDialogOpen(true);
-    setAnchorEl(null); // Close the menu when deleting
+    setAnchorEl(null);
   };
 
   const handleEditSubmit = async () => {
@@ -124,11 +127,13 @@ const CompletedTaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
+
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task._id === selectedTask._id ? { ...task, ...formData } : task
         )
       );
+
       setEditDialogOpen(false);
     } catch (error) {
       console.error(error);
@@ -151,6 +156,7 @@ const CompletedTaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
+
       setTasks((prevTasks) =>
         prevTasks.filter((task) => task._id !== selectedTask._id)
       );
@@ -167,7 +173,6 @@ const CompletedTaskList = () => {
     }
   };
 
-  // Menu handlers
   const handleMenuClick = (event, task) => {
     setSelectedTask(task);
     setAnchorEl(event.currentTarget);
@@ -268,7 +273,6 @@ const CompletedTaskList = () => {
             </IconButton>
           </CardContent>
 
-          {/* Menu for Edit/Delete */}
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
@@ -284,7 +288,6 @@ const CompletedTaskList = () => {
         </Card>
       ))}
 
-      {/* Edit Task Dialog */}
       <EditTaskDialog
         open={editDialogOpen}
         handleClose={() => setEditDialogOpen(false)}
@@ -294,7 +297,6 @@ const CompletedTaskList = () => {
         loading={loading}
       />
 
-      {/* Delete Task Dialog */}
       <DeleteTaskDialog
         open={deleteDialogOpen}
         handleClose={() => setDeleteDialogOpen(false)}

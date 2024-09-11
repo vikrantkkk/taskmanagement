@@ -1,4 +1,3 @@
-// src/components/MyAccountProfile.js
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useUpdateUserProfileMutation } from "../redux/api/userApi";
@@ -6,7 +5,6 @@ import { updateUserProfile } from "../redux/userSlice";
 
 const MyAccountProfile = () => {
   const { user } = useSelector((state) => state.auth);
-  console.log("🚀 ~ MyAccountProfile ~ user:", user);
   const [profileImage, setProfileImage] = useState(
     user?.profilePic || user?.user?.profilePic || "default-avatar.png"
   );
@@ -14,17 +12,16 @@ const MyAccountProfile = () => {
   const [email, setEmail] = useState(user?.email || user?.user?.email || "");
   const [profilePicFile, setProfilePicFile] = useState(null);
 
-  // Use the hook to get the mutation function
+ 
   const [updateUserProfileMutation] = useUpdateUserProfileMutation();
   const dispatch = useDispatch();
 
   const handleProfilePicChange = (e) => {
     const file = e.target.files[0];
-    console.log("🚀 ~ handleProfilePicChange ~ file:", file);
 
     if (file) {
       if (file.size > 1 * 1024 * 1024) {
-        // 1MB limit
+      
         alert("File size exceeds 5MB");
         return;
       }
@@ -49,7 +46,7 @@ const MyAccountProfile = () => {
         formData.append("images", profilePicFile);
       }
 
-      // Call the mutation
+ 
       const response = await updateUserProfileMutation(formData).unwrap();
       dispatch(updateUserProfile(response));
       console.log("Profile updated successfully:", response);
@@ -73,7 +70,7 @@ const MyAccountProfile = () => {
             accept="image/*"
             className="mt-2"
             id="profilePicInput"
-            disabled={false} // Ensure this is set to false
+            disabled={false} 
             style={{ display: "none" }}
           />
           <label

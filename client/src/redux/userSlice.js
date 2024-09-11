@@ -13,16 +13,16 @@ const authSlice = createSlice({
     register: (state, action) => {
       const { data, message, success, timestamp } = action.payload;
       localStorage.setItem("token", data.token);
-      state.user = data; // Store the user data
+      state.user = data;
       state.isLoggedIn = success;
       state.message = message;
       state.timestamp = timestamp;
     },
-    // Action to log in and set user and token
+   
     login: (state, action) => {
       const { data, message, success, timestamp } = action.payload;
       localStorage.setItem("token", data.token);
-      state.user = data; // Store the user data
+      state.user = data; 
       state.isLoggedIn = success;
       state.message = message;
       state.timestamp = timestamp;
@@ -36,21 +36,21 @@ const authSlice = createSlice({
       console.log("🚀 ~ data:", data)
       state.user = data;
     },
-    // Action to clear user and token (logout)
+ 
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.isLoggedIn = false;
     },
     resetUser: (state) => {
-      state.user = null; // Clear all tasks
+      state.user = null; 
     },
   },
 });
 
-// Export actions for components to use
+
 export const { register, login, verifyOtp, updateUserProfile, logout,resetUser } =
   authSlice.actions;
 
-// Export reducer to be added to the store
+
 export default authSlice.reducer;
