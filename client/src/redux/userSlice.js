@@ -11,29 +11,28 @@ const authSlice = createSlice({
   },
   reducers: {
     register: (state, action) => {
-      const { data, message, success, timestamp } = action.payload;
+      const { data, message, timestamp } = action.payload;
       localStorage.setItem("token", data.token);
       state.user = data;
-      state.isLoggedIn = success;
       state.message = message;
       state.timestamp = timestamp;
     },
    
     login: (state, action) => {
-      const { data, message, success, timestamp } = action.payload;
+      const { data, message, timestamp } = action.payload;
       localStorage.setItem("token", data.token);
       state.user = data; 
-      state.isLoggedIn = success;
       state.message = message;
       state.timestamp = timestamp;
     },
     verifyOtp: (state, action) => {
       const { data } = action.payload;
+      console.log("🚀 ~ data:", data?.user?.isVerified)
       state.user = data;
+      state.isLoggedIn = data?.user?.isVerified;
     },
     updateUserProfile: (state, action) => {
       const { data } = action.payload;
-      console.log("🚀 ~ data:", data)
       state.user = data;
     },
  

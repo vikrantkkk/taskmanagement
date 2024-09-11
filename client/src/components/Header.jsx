@@ -20,9 +20,9 @@ import CreateTaskDialog from "./CreateTaskDialog";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import io from "socket.io-client"; 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import TemporaryDrawer from "./TemporaryDrawer";
-
+import {logout} from "../redux/userSlice"
 const socket = io("http://localhost:5000");
 
 const Header = () => {
@@ -32,6 +32,7 @@ const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const res = useSelector((state) => state.auth.user);
 
@@ -79,6 +80,7 @@ const Header = () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/logout`);
       localStorage.clear();
+      dispatch(logout())
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
@@ -101,7 +103,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="p-4 flex items-center justify-between shadow-lg">
+    <header className="md:p-4 p-3 flex items-center justify-between shadow-lg">
       <div className="md:hidden block">
         <TemporaryDrawer />
       </div>

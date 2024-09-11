@@ -12,18 +12,19 @@ import "./app.css";
 import PendingTask from "./pages/PendingTask";
 import MyAccountProfile from "./pages/MyAccountProfile";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ProtectedRoute from "./components/ProtectedRoute"; 
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useSelector } from "react-redux";
 
 const App = () => {
-  const isVerified = localStorage.getItem("isVerified"); 
-
+  const { user } = useSelector((state) => state?.auth?.user) || "";
+  const isVerified = user?.isVerified;
   return (
     <Router>
       <Routes>
         <Route path="/" element={<AuthPage />} />
         <Route path="/verifyotp" element={<VerifyOtp />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route 
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute isVerified={isVerified}>

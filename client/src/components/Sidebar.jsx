@@ -10,15 +10,19 @@ import {
 import { Box, Typography } from "@mui/material";
 import SingleStoreIcon from "../assets/icons/SingleStoreIcon";
 import axios from "axios";
+import { logout } from "../redux/userSlice";
+import { useDispatch } from "react-redux";
 
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/logout`);
-      localStorage.removeItem("token");
+      localStorage.clear();
+      dispatch(logout())
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);

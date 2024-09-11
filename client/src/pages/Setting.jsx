@@ -236,6 +236,12 @@ const SettingsPage = () => {
               color="primary"
               fullWidth
               className="mt-4"
+              sx={{
+                backgroundColor: "#673AB7",
+                "&:hover": {
+                  backgroundColor: "#5e35b1",
+                },
+              }}
             >
               Update Password
             </Button>
