@@ -16,7 +16,6 @@ import { useSnackbar } from "notistack";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-// Define Yup schema for registration
 const registerSchema = yup.object().shape({
   name: yup.string().required("Name is required"),
   email: yup
@@ -40,7 +39,7 @@ const Register = () => {
   const [registerMutation, { isLoading }] = useRegisterMutation();
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const methods = useForm({
     resolver: yupResolver(registerSchema),
@@ -63,12 +62,12 @@ const Register = () => {
   };
 
   const onSubmit = async (data) => {
-    const { confirmPassword, ...payload } = data; // Exclude confirmPassword from the payload
+    const { confirmPassword, ...payload } = data;
     try {
       const response = await registerMutation(payload).unwrap();
       enqueueSnackbar(response?.message, { variant: "success" });
-      localStorage.setItem("userId",response?.data?._id)
-      // Save user info and token to the store
+      localStorage.setItem("userId", response?.data?._id);
+
       dispatch(register(response));
       if (response?.success) {
         navigate("/verifyotp");
@@ -85,7 +84,6 @@ const Register = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="w-full max-w-md mx-auto p-4 bg-white rounded-lg shadow-lg relative"
       >
-        {/* Name Field */}
         <Box mb={2}>
           <TextField
             label="Name"
@@ -96,7 +94,6 @@ const Register = () => {
           />
         </Box>
 
-        {/* Email Field */}
         <Box mb={2}>
           <TextField
             label="Email"
@@ -107,7 +104,6 @@ const Register = () => {
           />
         </Box>
 
-        {/* Password Field with Eye Icon */}
         <Box mb={2}>
           <TextField
             label="Password"
@@ -128,7 +124,6 @@ const Register = () => {
           />
         </Box>
 
-        {/* Confirm Password Field with Eye Icon */}
         <Box mb={2}>
           <TextField
             label="Confirm Password"
@@ -152,7 +147,6 @@ const Register = () => {
           />
         </Box>
 
-        {/* Sign Up Button */}
         <Button
           type="submit"
           variant="contained"
@@ -161,15 +155,14 @@ const Register = () => {
           sx={{
             backgroundColor: "#673AB7",
             "&:hover": {
-              backgroundColor: "#5e35b1", // Hover color
+              backgroundColor: "#5e35b1",
             },
           }}
-          disabled={isLoading} // Disable button when loading
+          disabled={isLoading}
         >
           {isLoading ? "Signing Up..." : "Sign Up"}
         </Button>
 
-        {/* Error Message Display */}
         {error && (
           <Box mt={2}>
             <p className="text-red-500 text-center">{error}</p>

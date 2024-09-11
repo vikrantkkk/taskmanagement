@@ -9,7 +9,6 @@ const AuthPage = () => {
 
   return (
     <Box className="min-h-screen p-4 sm:p-8 flex items-center justify-center relative overflow-hidden bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-
       <Box className="absolute w-64 h-64 rounded-full bg-white opacity-20 animate-spin-slow top-1/4 left-1/4"></Box>
       <Box className="absolute w-96 h-96 rounded-full bg-white opacity-10 animate-spin-slow top-2/4 right-1/4"></Box>
 
@@ -17,8 +16,8 @@ const AuthPage = () => {
         <SingleStoreIcon />
         <Box className="font-bold text-lg sm:text-xl text-white">TaskPro</Box>
       </Box>
- 
-      <Box className="relative mt-8  w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white p-4 sm:p-8 rounded-lg flex gap-4 flex-col items-center shadow-lg z-10">
+
+      <Box className="relative mt-6 w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white p-4 sm:p-8 rounded-lg flex gap-4 flex-col items-center shadow-lg z-10">
         <Box className="text-[#673AB7] font-bold text-lg sm:text-2xl text-center">
           Hi, Welcome Back
         </Box>

@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Dashboard,
   ListAlt,
@@ -9,9 +9,22 @@ import {
 } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
 import SingleStoreIcon from "../assets/icons/SingleStoreIcon"; // Update this path if needed
+import axios from "axios"; // Import axios
 
 const Sidebar = () => {
   const location = useLocation(); // Get current route path
+  const navigate = useNavigate(); // Use navigate for redirection
+
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/logout`);
+      localStorage.removeItem("token");
+      navigate("/"); // Redirect to the login or home page
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   // Define active link background color and hover states
   const activeClassName = "bg-blue-700 text-white"; // Active background color
@@ -63,7 +76,6 @@ const Sidebar = () => {
             </Link>
           </li>
 
-
           {/* In Progress */}
           <li className="flex items-center rounded-lg p-2">
             <Link
@@ -71,22 +83,21 @@ const Sidebar = () => {
               className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/inprogress-task" ? activeClassName : inactiveClassName}`}
             >
               <HourglassEmpty fontSize="small" />
-              <Typography>InProgress Taks</Typography>
+              <Typography>InProgress Task</Typography>
             </Link>
           </li>
 
-
-          {/* In Pending */}
+          {/* Pending */}
           <li className="flex items-center rounded-lg p-2">
             <Link
               to="/dashboard/pending-task"
               className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${location.pathname === "/dashboard/pending-task" ? activeClassName : inactiveClassName}`}
             >
-               <PendingActions fontSize="small" />
-              <Typography>Pending task</Typography>
+              <PendingActions fontSize="small" />
+              <Typography>Pending Task</Typography>
             </Link>
           </li>
-          
+
           {/* Settings */}
           <li className="flex items-center rounded-lg p-2">
             <Link
@@ -96,6 +107,17 @@ const Sidebar = () => {
               <Settings fontSize="small" />
               <Typography>Settings</Typography>
             </Link>
+          </li>
+
+          {/* Logout */}
+          <li className="flex items-center rounded-lg p-2">
+            <button
+              onClick={handleLogout}
+              className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${inactiveClassName}`}
+            >
+              <Settings fontSize="small" />
+              <Typography>Logout</Typography>
+            </button>
           </li>
         </ul>
       </nav>

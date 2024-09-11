@@ -2,10 +2,19 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import SingleStoreIcon from "../assets/icons/SingleStoreIcon";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 
-// Yup schema for email validation
 const emailSchema = yup.object().shape({
   email: yup
     .string()
@@ -13,7 +22,6 @@ const emailSchema = yup.object().shape({
     .required("Email is required"),
 });
 
-// Yup schema for reset password validation
 const passwordSchema = yup.object().shape({
   otp: yup
     .string()
@@ -30,9 +38,11 @@ const passwordSchema = yup.object().shape({
 });
 
 const ForgotPasswordPage = () => {
-  const [isOtpSent, setIsOtpSent] = useState(false); // State to toggle between forms
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
-  // Form handling for Forgot Password (sending OTP)
   const {
     register: registerEmail,
     handleSubmit: handleSubmitEmail,
@@ -41,7 +51,6 @@ const ForgotPasswordPage = () => {
     resolver: yupResolver(emailSchema),
   });
 
-  // Form handling for Reset Password
   const {
     register: registerPassword,
     handleSubmit: handleSubmitPassword,
@@ -50,7 +59,6 @@ const ForgotPasswordPage = () => {
     resolver: yupResolver(passwordSchema),
   });
 
-  // Function to handle sending OTP (Forgot Password)
   const handleSendOtp = async (data) => {
     try {
       const response = await fetch(
@@ -65,18 +73,19 @@ const ForgotPasswordPage = () => {
       );
 
       if (response.ok) {
-        alert("OTP sent successfully!");
-        setIsOtpSent(true); // Switch to the Reset Password form
+        enqueueSnackbar("OTP sent successfully!", { variant: "success" });
+        setIsOtpSent(true);
       } else {
-        alert("Failed to send OTP. Please check your email address.");
+        enqueueSnackbar(
+          "Failed to send OTP. Please check your email address.",
+          { variant: "error" }
+        );
       }
     } catch (error) {
-      console.error("Error sending OTP:", error);
-      alert("Something went wrong.");
+      enqueueSnackbar("Something went wrong.", { variant: "error" });
     }
   };
 
-  // Function to handle resetting the password (Reset Password)
   const handleResetPassword = async (data) => {
     try {
       const response = await fetch(
@@ -94,21 +103,22 @@ const ForgotPasswordPage = () => {
       );
 
       if (response.ok) {
-        alert("Password reset successfully!");
-        // Optionally redirect the user or reset the form after success
+        enqueueSnackbar("Password reset successfully!", { variant: "success" });
+        navigate("/");
       } else {
-        alert("Failed to reset password. Please check the OTP.");
+        enqueueSnackbar("Failed to reset password. Please check the OTP.", {
+          variant: "error",
+        });
       }
     } catch (error) {
-      console.error("Error resetting password:", error);
-      alert("Something went wrong.");
+      enqueueSnackbar("Something went wrong.", { variant: "error" });
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen overflow-hidden bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-      <Box className="absolute w-64 h-64 rounded-full bg-white opacity-20 animate-spin-slow top-1/4 left-1/4"></Box>
-      <Box className="absolute w-96 h-96 rounded-full bg-white opacity-10 animate-spin-slow top-2/4 right-1/4"></Box>
+    <div className="flex p-4 sm:p-8 items-center justify-center min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
+      <Box className="absolute  rounded-full bg-white opacity-20 animate-spin-slow top-1/4 left-1/4"></Box>
+      <Box className="absolute rounded-full bg-white opacity-10 animate-spin-slow top-2/4 right-1/4"></Box>
 
       <Box className="absolute top-4 left-4 flex items-center gap-2">
         <SingleStoreIcon />
@@ -117,10 +127,9 @@ const ForgotPasswordPage = () => {
         </Typography>
       </Box>
 
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+      <div className="w-full  max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
         {!isOtpSent ? (
           <>
-            {/* Forgot Password (Send OTP) Form */}
             <h2 className="text-2xl font-bold text-center text-gray-800">
               Forgot Password
             </h2>
@@ -128,37 +137,27 @@ const ForgotPasswordPage = () => {
               onSubmit={handleSubmitEmail(handleSendOtp)}
               className="space-y-6"
             >
-              <div className="flex flex-col space-y-1">
-                <label
-                  htmlFor="email"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  {...registerEmail("email")}
-                />
-                {emailErrors.email && (
-                  <p className="text-sm text-red-500">
-                    {emailErrors.email.message}
-                  </p>
-                )}
-              </div>
-
-              <button
+              <TextField
+                id="email"
+                label="Email"
+                variant="outlined"
+                fullWidth
+                {...registerEmail("email")}
+                error={!!emailErrors.email}
+                helperText={emailErrors.email?.message}
+              />
+              <Button
                 type="submit"
-                className="w-full px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                variant="contained"
+                color="primary"
+                fullWidth
               >
                 Send OTP
-              </button>
+              </Button>
             </form>
           </>
         ) : (
           <>
-            {/* Reset Password Form */}
             <h2 className="text-2xl font-bold text-center text-gray-800">
               Reset Password
             </h2>
@@ -166,72 +165,68 @@ const ForgotPasswordPage = () => {
               onSubmit={handleSubmitPassword(handleResetPassword)}
               className="space-y-6"
             >
-              <div className="flex flex-col space-y-1">
-                <label
-                  htmlFor="otp"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Enter OTP
-                </label>
-                <input
-                  id="otp"
-                  type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  {...registerPassword("otp")}
-                />
-                {passwordErrors.otp && (
-                  <p className="text-sm text-red-500">
-                    {passwordErrors.otp.message}
-                  </p>
-                )}
-              </div>
+              <TextField
+                id="otp"
+                label="Enter OTP"
+                variant="outlined"
+                fullWidth
+                {...registerPassword("otp")}
+                error={!!passwordErrors.otp}
+                helperText={passwordErrors.otp?.message}
+              />
 
-              <div className="flex flex-col space-y-1">
-                <label
-                  htmlFor="newPassword"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  New Password
-                </label>
-                <input
-                  id="newPassword"
-                  type="password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  {...registerPassword("newPassword")}
-                />
-                {passwordErrors.newPassword && (
-                  <p className="text-sm text-red-500">
-                    {passwordErrors.newPassword.message}
-                  </p>
-                )}
-              </div>
+              <TextField
+                id="newPassword"
+                label="New Password"
+                variant="outlined"
+                type={showPassword ? "text" : "password"}
+                fullWidth
+                {...registerPassword("newPassword")}
+                error={!!passwordErrors.newPassword}
+                helperText={passwordErrors.newPassword?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
 
-              <div className="flex flex-col space-y-1">
-                <label
-                  htmlFor="confirmPassword"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Confirm Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  {...registerPassword("confirmPassword")}
-                />
-                {passwordErrors.confirmPassword && (
-                  <p className="text-sm text-red-500">
-                    {passwordErrors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
+              <TextField
+                id="confirmPassword"
+                label="Confirm Password"
+                variant="outlined"
+                type={showPassword ? "text" : "password"}
+                fullWidth
+                {...registerPassword("confirmPassword")}
+                error={!!passwordErrors.confirmPassword}
+                helperText={passwordErrors.confirmPassword?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
 
-              <button
+              <Button
                 type="submit"
-                className="w-full px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                variant="contained"
+                color="primary"
+                fullWidth
               >
                 Reset Password
-              </button>
+              </Button>
             </form>
           </>
         )}

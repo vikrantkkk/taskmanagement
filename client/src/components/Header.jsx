@@ -77,7 +77,7 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/logout`);
-      localStorage.removeItem("token");
+      localStorage.clear();
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);

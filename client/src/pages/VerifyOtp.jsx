@@ -9,9 +9,8 @@ import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { useVerifyOtpMutation } from "../redux/api/userApi";
 import { verifyOtp } from "../redux/userSlice";
-import SingleStoreIcon from "../assets/icons/SingleStoreIcon"; // Your logo icon
+import SingleStoreIcon from "../assets/icons/SingleStoreIcon";
 
-// Validation schema
 const otpSchema = yup.object().shape({
   otp: yup
     .string()
@@ -28,7 +27,6 @@ const VerifyOtp = () => {
   const dispatch = useDispatch();
   const { email } = useSelector((state) => state?.auth?.user) || "";
 
-  // RTK Query hook for OTP verification
   const [verifyOtpMutation] = useVerifyOtpMutation();
 
   const { handleSubmit, control, setValue, formState } = useForm({
@@ -72,17 +70,16 @@ const VerifyOtp = () => {
 
   return (
     <Box className="min-h-screen p-4 sm:p-8 flex items-center justify-center relative overflow-hidden bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-      {/* Rotating background elements */}
       <Box className="absolute w-64 h-64 rounded-full bg-white opacity-20 animate-spin-slow top-1/4 left-1/4"></Box>
       <Box className="absolute w-96 h-96 rounded-full bg-white opacity-10 animate-spin-slow top-2/4 right-1/4"></Box>
 
-      {/* Logo in the top-left corner */}
       <Box className="absolute top-4 left-4 flex items-center gap-2">
         <SingleStoreIcon />
-        <Typography className="font-bold text-lg sm:text-xl text-white">TaskPro</Typography>
+        <Typography className="font-bold text-lg sm:text-xl text-white">
+          TaskPro
+        </Typography>
       </Box>
 
-      {/* Main form box */}
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
@@ -105,7 +102,6 @@ const VerifyOtp = () => {
           We've sent a code to <strong>{email}</strong>
         </Typography>
 
-        {/* OTP Fields */}
         <Box
           mb={4}
           display="flex"
@@ -133,14 +129,12 @@ const VerifyOtp = () => {
           ))}
         </Box>
 
-        {/* Error Message */}
         {errors.otp && (
           <Typography color="error.main" align="center" mb={2}>
             {errors.otp.message}
           </Typography>
         )}
 
-        {/* Buttons */}
         <Box className="flex items-center justify-center gap-4 w-full mt-4">
           <Button
             variant="outlined"

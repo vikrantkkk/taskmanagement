@@ -17,7 +17,6 @@ import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../redux/api/userApi";
 import { login } from "../redux/userSlice";
 
-// Define Yup schema for login
 const loginSchema = yup.object().shape({
   email: yup
     .string()
@@ -30,12 +29,12 @@ const loginSchema = yup.object().shape({
 });
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const [loginMutation, { isLoading, isError, error }] = useLoginMutation();
+  const [loginMutation, { isLoading }] = useLoginMutation();
 
   const methods = useForm({
     resolver: yupResolver(loginSchema),
@@ -47,7 +46,6 @@ const Login = () => {
 
   const { handleSubmit } = methods;
 
-  // Toggle show/hide password
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -55,10 +53,9 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       const response = await loginMutation(data).unwrap();
-      console.log("🚀 ~ onSubmit ~ response:", response)
+      console.log("🚀 ~ onSubmit ~ response:", response);
       enqueueSnackbar(response?.message, { variant: "success" });
-      localStorage.setItem("userId",response?.data?._id)
-      // Save user info and token to the store
+      localStorage.setItem("userId", response?.data?._id);
       dispatch(login(response));
       if (response?.success) {
         navigate("/verifyotp");
@@ -77,7 +74,6 @@ const Login = () => {
         className="w-full max-w-sm mx-auto p-4 bg-white rounded-lg shadow-lg relative"
         position="relative"
       >
-        {/* Loader */}
         {isLoading && (
           <Box
             sx={{
@@ -91,14 +87,13 @@ const Login = () => {
               justifyContent: "center",
               width: "100%",
               height: "100%",
-              backgroundColor: "rgba(255, 255, 255, 0.8)", // Optional: to dim the background
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
             }}
           >
             <CircularProgress sx={{ color: "#673AB7" }} />
           </Box>
         )}
 
-        {/* Email Field */}
         <Box mb={2}>
           <TextField
             label="Email"
@@ -110,7 +105,6 @@ const Login = () => {
           />
         </Box>
 
-        {/* Password Field with Eye Icon */}
         <Box mb={2}>
           <TextField
             label="Password"
@@ -132,7 +126,6 @@ const Login = () => {
           />
         </Box>
 
-        {/* Sign In Button */}
         <Button
           type="submit"
           variant="contained"
@@ -142,16 +135,20 @@ const Login = () => {
           sx={{
             backgroundColor: "#673AB7",
             "&:hover": {
-              backgroundColor: "#5e35b1", // Hover color
+              backgroundColor: "#5e35b1",
             },
           }}
         >
           Sign In
         </Button>
 
-        {/* Forgot Password */}
         <Box className="text-right mt-2">
-          <Button onClick={()=>navigate("/forgot-password")} color="primary" variant="text" disabled={isLoading}>
+          <Button
+            onClick={() => navigate("/forgot-password")}
+            color="primary"
+            variant="text"
+            disabled={isLoading}
+          >
             Forgot Password?
           </Button>
         </Box>
