@@ -4,15 +4,17 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const morgan = require("morgan");
+const { Server } = require("socket.io"); // New
+const http = require("http"); // New
 const reposeHandler = require("./services/responseHandler/send");
 const userRoute = require("./routes/userRoute");
 const taskRoute = require("./routes/taskRoute");
-const http = require("http"); // New
-const { Server } = require("socket.io"); // New
+require("./services/cron/cronSheduleReminder");
 
 const app = express();
 const server = http.createServer(app); // New
-const io = new Server(server, { // New
+const io = new Server(server, {
+  // New
   cors: {
     origin: "http://localhost:5173",
     credentials: true,

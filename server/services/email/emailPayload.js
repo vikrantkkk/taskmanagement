@@ -22,6 +22,9 @@ module.exports.mailPayload = (template_id, payload) => {
     case "password_reset_confirmation":
       template = EmailTemplate.passwordResetConfirmationEmail(payload);
       break;
+    case "task_reminder":
+      template = EmailTemplate.taskDueReminderEmail(payload);
+      break;
     case "account_delete":
       template = EmailTemplate.accountDeletionEmail(payload);
       break;

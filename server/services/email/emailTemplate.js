@@ -45,7 +45,7 @@ const otpEmail = ({ email, otp }) => {
   };
 };
 
-const profileUpdateEmail = ({ email,name }) => {
+const profileUpdateEmail = ({ email, name }) => {
   return {
     subject: "Profile Updated Successfully - TaskPro Manager",
     html: `
@@ -112,11 +112,25 @@ const accountDeletionEmail = ({ email }) => {
   };
 };
 
+const taskDueReminderEmail = ({ email, name, taskName, dueDate }) => {
+  return {
+    subject: `Reminder: Task "${taskName}" is due soon!`,
+    html: `
+      ${emailHeader}
+      <p>Hello, ${name} (${email})!</p>
+      <p>This is a reminder that your task <strong>"${taskName}"</strong> is due on <strong>${dueDate}</strong>.</p>
+      <p>Please ensure the task is completed on time.</p>
+      ${emailFooter}
+    `,
+  };
+};
+
 module.exports = {
   congratulationEmail,
   otpEmail,
   profileUpdateEmail,
   changePasswordEmail,
   passwordResetConfirmationEmail,
-  accountDeletionEmail
+  accountDeletionEmail,
+  taskDueReminderEmail,
 };
