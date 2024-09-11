@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import io from "socket.io-client"; // Import socket.io-client
 import { useSelector } from "react-redux";
+import TemporaryDrawer from "./TemporaryDrawer";
 
 const socket = io("http://localhost:5000"); // Connect to your backend socket
 
@@ -101,7 +102,10 @@ const Header = () => {
 
   return (
     <header className="p-4 flex items-center justify-between shadow-lg">
-      <h1 className="text-2xl font-bold">Task Manager</h1>
+      <div className="md:hidden block">
+        <TemporaryDrawer />
+      </div>
+      <h1 className="text-2xl font-bold md:block hidden">Task Manager</h1>
 
       <div className="flex items-center space-x-4">
         <Button

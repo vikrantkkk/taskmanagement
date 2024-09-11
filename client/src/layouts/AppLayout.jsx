@@ -6,7 +6,7 @@ import { Outlet } from "react-router-dom";
 const AppLayout = () => {
   return (
     <div className="flex h-screen">
-      <div className="w-64 bg-gray-800 text-white h-full sticky top-0">
+      <div className="hidden md:block w-64 bg-gray-800 text-white h-full sticky top-0">
         <Sidebar />
       </div>
       <div className="flex-1 flex flex-col">
