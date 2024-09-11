@@ -26,7 +26,7 @@ const VerifyOtp = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { email } = useSelector((state) => state.auth.user);
+  const { email } = useSelector((state) => state?.auth?.user) || "";
 
   // RTK Query hook for OTP verification
   const [verifyOtpMutation] = useVerifyOtpMutation();
@@ -151,7 +151,7 @@ const VerifyOtp = () => {
               color: "#673AB7",
               "&:hover": { borderColor: "#673AB7", backgroundColor: "#EDE7F6" },
             }}
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/")}
           >
             Cancel
           </Button>

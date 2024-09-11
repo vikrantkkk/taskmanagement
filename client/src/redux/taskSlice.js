@@ -27,11 +27,14 @@ const taskSlice = createSlice({
     setUserTasks: (state, action) => {
       state.tasks = action.payload;
     },
+    resetTasks: (state) => {
+      state.tasks = []; // Clear all tasks
+    },
   },
 });
 
 // Export actions for components to use
-export const { addTask, updateTask, removeTask, setUserTasks } = taskSlice.actions;
+export const { addTask, updateTask, removeTask, setUserTasks, resetTasks } = taskSlice.actions;
 
 // Export reducer to be added to the store
 export default taskSlice.reducer;

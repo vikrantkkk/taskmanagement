@@ -55,7 +55,9 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       const response = await loginMutation(data).unwrap();
+      console.log("🚀 ~ onSubmit ~ response:", response)
       enqueueSnackbar(response?.message, { variant: "success" });
+      localStorage.setItem("userId",response?.data?._id)
       // Save user info and token to the store
       dispatch(login(response));
       if (response?.success) {
@@ -63,7 +65,7 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Login failed:", err);
-      enqueueSnackbar("Login failed. Please try again.", { variant: "error" });
+      enqueueSnackbar(err?.data?.message, { variant: "error" });
     }
   };
 
@@ -149,7 +151,7 @@ const Login = () => {
 
         {/* Forgot Password */}
         <Box className="text-right mt-2">
-          <Button color="primary" variant="text" disabled={isLoading}>
+          <Button onClick={()=>navigate("/forgot-password")} color="primary" variant="text" disabled={isLoading}>
             Forgot Password?
           </Button>
         </Box>

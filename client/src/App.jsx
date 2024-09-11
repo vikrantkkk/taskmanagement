@@ -8,9 +8,10 @@ import TaskList from "./components/TaskList";
 import InProgressTaskList from "./pages/InProgressTaskList";
 import CompletedTaskList from "./pages/CompletedTaskList";
 import Setting from "./pages/Setting";
-import './app.css'
+import "./app.css";
 import PendingTask from "./pages/PendingTask";
 import MyAccountProfile from "./pages/MyAccountProfile";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<AuthPage />} />
         <Route path="/verifyotp" element={<VerifyOtp />} />
+        <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/dashboard" element={<AppLayout />}>
           <Route path="tasks" element={<TaskList />} />
           <Route path="pending-task" element={<PendingTask />} />

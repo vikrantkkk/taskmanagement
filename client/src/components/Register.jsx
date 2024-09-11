@@ -67,6 +67,7 @@ const Register = () => {
     try {
       const response = await registerMutation(payload).unwrap();
       enqueueSnackbar(response?.message, { variant: "success" });
+      localStorage.setItem("userId",response?.data?._id)
       // Save user info and token to the store
       dispatch(register(response));
       if (response?.success) {

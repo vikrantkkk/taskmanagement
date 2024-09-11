@@ -35,7 +35,7 @@ router.post("/reset-password", resetPassword);
 router.delete(
   "/delete-user/:userId",
   authMiddleware,
-  authorizeRoles(["admin"]),
+  authorizeRoles(["admin","user"]),
   deleteUser
 );
 router.post("/logout", logoutUser);

@@ -42,11 +42,14 @@ const authSlice = createSlice({
       state.token = null;
       state.isLoggedIn = false;
     },
+    resetUser: (state) => {
+      state.user = null; // Clear all tasks
+    },
   },
 });
 
 // Export actions for components to use
-export const { register, login, verifyOtp, updateUserProfile, logout } =
+export const { register, login, verifyOtp, updateUserProfile, logout,resetUser } =
   authSlice.actions;
 
 // Export reducer to be added to the store

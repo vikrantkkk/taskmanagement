@@ -18,17 +18,17 @@ const DashboardCard = ({ title, value }) => {
 };
 
 const Dashboard = () => {
-  const { tasks } = useSelector((state) => state.task);
+  const { tasks } = useSelector((state) => state?.task);
 
   // Calculate summary values
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(
-    (task) => task.status === "completed"
+    (task) => task?.status === "completed"
   ).length;
   const pendingTasks = tasks.filter((task) => task.status === "pending").length;
   const inProgressTasks = tasks.filter((task) => task.status === "inprogress").length;
   const teamMembers = Array.from(
-    new Set(tasks.map((task) => task.owner.name))
+    new Set(tasks.map((task) => task?.owner?.name))
   ).length;
 
   // Line chart data
@@ -48,7 +48,7 @@ const Dashboard = () => {
     },
     xaxis: {
       categories: tasks.reduce((acc, task) => {
-        const monthYear = new Date(task.dueDate).toLocaleString("default", { year: "numeric", month: "short" });
+        const monthYear = new Date(task?.dueDate).toLocaleString("default", { year: "numeric", month: "short" });
         if (!acc.includes(monthYear)) acc.push(monthYear);
         return acc;
       }, []),
