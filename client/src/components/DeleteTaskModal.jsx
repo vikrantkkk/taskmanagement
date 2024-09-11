@@ -17,11 +17,11 @@ const DeleteTaskDialog = ({
   loading,
 }) => {
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth>
+    <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Delete Task</DialogTitle>
       <DialogContent>
         <Typography>
-          Are you sure you want to delete the task "{selectedTask?.title}"?
+          Are you sure you want to delete this task ?
         </Typography>
       </DialogContent>
       <DialogActions>
@@ -33,6 +33,12 @@ const DeleteTaskDialog = ({
           color="primary"
           disabled={loading}
           variant="contained"
+          sx={{
+            backgroundColor: "#673AB7",
+            "&:hover": {
+              backgroundColor: "#5e35b1",
+            },
+          }}
         >
           {loading ? <CircularProgress size={24} /> : "Delete"}
         </Button>
