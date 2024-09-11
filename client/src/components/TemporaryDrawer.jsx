@@ -2,11 +2,11 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Box, Typography, Drawer, IconButton } from "@mui/material";
 import { Dashboard, ListAlt, HourglassEmpty, CheckCircle, Settings, PendingActions } from "@mui/icons-material";
-import SingleStoreIcon from "../assets/icons/SingleStoreIcon"; // Ensure this path is correct
+import SingleStoreIcon from "../assets/icons/SingleStoreIcon"; 
 import axios from "axios";
 import { logout } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
-import MenuIcon from "@mui/icons-material/Menu"; // Import MenuIcon from MUI
+import MenuIcon from "@mui/icons-material/Menu";
 
 const Sidebar = () => {
   const [open, setOpen] = React.useState(false);
