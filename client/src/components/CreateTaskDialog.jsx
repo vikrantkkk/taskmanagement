@@ -19,24 +19,24 @@ import axios from "axios";
 import { useSnackbar } from "notistack";
 import {
   useCreateTaskMutation,
-  useGetUserTasksQuery,
 } from "../redux/api/taskApi";
-import { addTask } from "../redux/taskSlice";
 import { useDispatch } from "react-redux";
+import { addTask } from "../redux/taskSlice";
 
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
   dueDate: yup
     .date()
     .required("Due date is required")
-    .min(new Date().toISOString().split('T')[0], "Due date cannot be in the past") 
+    .min(new Date().toISOString().split('T')[0], "Due date cannot be in the past"),
 });
 
 const CreateTaskDialog = ({ open, handleClose }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [users, setUsers] = useState([]);
-  const [createTask] = useCreateTaskMutation();
+  const [createTask ] = useCreateTaskMutation();
   const dispatch = useDispatch();
+
 
   const {
     control,
@@ -46,11 +46,17 @@ const CreateTaskDialog = ({ open, handleClose }) => {
     reset,
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      title: "",
+      description: "",
+      status: "pending", // Default status
+      priority: "low", // Default priority
+      dueDate: "",
+      assignedTo: [],
+    },
   });
 
   const token = localStorage.getItem("token");
-
-  const { refetch } = useGetUserTasksQuery();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -86,16 +92,8 @@ const CreateTaskDialog = ({ open, handleClose }) => {
       const response = await createTask(taskData).unwrap();
       enqueueSnackbar(response?.message, { variant: "success" });
       dispatch(addTask(response));
-      refetch();
-      reset({
-        title: "",
-        description: "",
-        status: "",
-        priority: "",
-        dueDate: "",
-        assignedTo: [],
-      });
-      handleClose();
+      reset();
+      handleClose(); // Close the dialog after task creation
     } catch (error) {
       console.log(error);
     }
