@@ -26,7 +26,10 @@ import { useDispatch } from "react-redux";
 
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
-  dueDate: yup.date().required("Due date is required"),
+  dueDate: yup
+    .date()
+    .required("Due date is required")
+    .min(new Date().toISOString().split('T')[0], "Due date cannot be in the past") 
 });
 
 const CreateTaskDialog = ({ open, handleClose }) => {
@@ -84,7 +87,14 @@ const CreateTaskDialog = ({ open, handleClose }) => {
       enqueueSnackbar(response?.message, { variant: "success" });
       dispatch(addTask(response));
       refetch();
-      reset();
+      reset({
+        title: "",
+        description: "",
+        status: "",
+        priority: "",
+        dueDate: "",
+        assignedTo: [],
+      });
       handleClose();
     } catch (error) {
       console.log(error);

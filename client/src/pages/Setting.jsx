@@ -10,7 +10,6 @@ import { resetTasks } from '../redux/taskSlice';
 import { resetUser } from '../redux/userSlice';
 import { useDispatch } from "react-redux";
 
-
 const schema = Yup.object().shape({
   currentPassword: Yup.string().required("Current password is required"),
   newPassword: Yup.string()
@@ -27,16 +26,15 @@ const SettingsPage = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
+  
   const { enqueueSnackbar } = useSnackbar();
 
- 
   const {
     control,
     handleSubmit,
     formState: { errors },
-    reset,
+    reset,  // Use this for resetting the form
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
@@ -63,7 +61,11 @@ const SettingsPage = () => {
         enqueueSnackbar("Password updated successfully", {
           variant: "success",
         });
-        reset(); 
+        reset({
+          currentPassword: "",
+          newPassword: "",
+          confirmNewPassword: "",
+        });
       } else {
         const result = await response.json();
         enqueueSnackbar(result.message || "Failed to update password", {
@@ -93,10 +95,9 @@ const SettingsPage = () => {
 
       if (response.ok) {
         enqueueSnackbar("Account deleted successfully", { variant: "success" });
-       
         navigate("/");
-        dispatch(resetTasks())
-        dispatch(resetUser())
+        dispatch(resetTasks());
+        dispatch(resetUser());
         localStorage.clear();
       } else {
         const result = await response.json();
@@ -117,7 +118,7 @@ const SettingsPage = () => {
       <div className="container mx-auto p-6 max-w-4xl">
         <h1 className="text-3xl font-bold text-gray-700 mb-8">Settings</h1>
 
-        {/* Password Update Section */}
+     
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
           <h2 className="text-2xl font-semibold text-gray-600 mb-4">
             Update Password
@@ -134,24 +135,16 @@ const SettingsPage = () => {
                   fullWidth
                   variant="outlined"
                   error={!!errors.currentPassword}
-                  helperText={
-                    errors.currentPassword ? errors.currentPassword.message : ""
-                  }
+                  helperText={errors.currentPassword?.message}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           aria-label="toggle password visibility"
-                          onClick={() =>
-                            setShowCurrentPassword(!showCurrentPassword)
-                          }
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                           edge="end"
                         >
-                          {showCurrentPassword ? (
-                            <VisibilityOff />
-                          ) : (
-                            <Visibility />
-                          )}
+                          {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -171,9 +164,7 @@ const SettingsPage = () => {
                   fullWidth
                   variant="outlined"
                   error={!!errors.newPassword}
-                  helperText={
-                    errors.newPassword ? errors.newPassword.message : ""
-                  }
+                  helperText={errors.newPassword?.message}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -202,26 +193,16 @@ const SettingsPage = () => {
                   fullWidth
                   variant="outlined"
                   error={!!errors.confirmNewPassword}
-                  helperText={
-                    errors.confirmNewPassword
-                      ? errors.confirmNewPassword.message
-                      : ""
-                  }
+                  helperText={errors.confirmNewPassword?.message}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           aria-label="toggle password visibility"
-                          onClick={() =>
-                            setShowConfirmNewPassword(!showConfirmNewPassword)
-                          }
+                          onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
                           edge="end"
                         >
-                          {showConfirmNewPassword ? (
-                            <VisibilityOff />
-                          ) : (
-                            <Visibility />
-                          )}
+                          {showConfirmNewPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -248,7 +229,7 @@ const SettingsPage = () => {
           </form>
         </div>
 
-        {/* Permanently Delete Account Section */}
+  
         <div className="bg-white shadow-md rounded-lg p-6">
           <h2 className="text-2xl font-semibold text-red-600 mb-4">
             Permanently Delete Your Account

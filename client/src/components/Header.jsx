@@ -19,10 +19,10 @@ import {
 import CreateTaskDialog from "./CreateTaskDialog";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import io from "socket.io-client"; 
+import io from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import TemporaryDrawer from "./TemporaryDrawer";
-import {logout} from "../redux/userSlice"
+import { logout } from "../redux/userSlice";
 const socket = io("http://localhost:5000");
 
 const Header = () => {
@@ -32,41 +32,34 @@ const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const res = useSelector((state) => state.auth.user);
-
 
   const handleOpenCreateTaskDialog = () => {
     setOpenCreateTaskDialog(true);
   };
 
- 
   const handleCloseCreateTaskDialog = () => {
     setOpenCreateTaskDialog(false);
   };
-
 
   const handleOpenProfileMenu = (event) => {
     setProfileMenuAnchorEl(event.currentTarget);
   };
 
-
   const handleCloseProfileMenu = () => {
     setProfileMenuAnchorEl(null);
   };
 
- 
   const handleNotificationClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-
 
   const handleCloseNotificationMenu = () => {
     setAnchorEl(null);
   };
 
- 
   const markAsRead = (index) => {
     const updatedNotifications = [...notifications];
     updatedNotifications.splice(index, 1);
@@ -75,19 +68,17 @@ const Header = () => {
     handleCloseNotificationMenu();
   };
 
-
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/logout`);
       localStorage.clear();
-      dispatch(logout())
+      dispatch(logout());
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
- 
   useEffect(() => {
     socket.on("newTaskNotification", (notification) => {
       setNotifications((prevNotifications) => [
@@ -98,7 +89,7 @@ const Header = () => {
     });
 
     return () => {
-      socket.off("newTaskNotification"); 
+      socket.off("newTaskNotification");
     };
   }, []);
 
@@ -145,7 +136,6 @@ const Header = () => {
         handleClose={handleCloseCreateTaskDialog}
       />
 
-      {/* Notifications Popover */}
       <Popover
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
@@ -177,7 +167,6 @@ const Header = () => {
         </MenuList>
       </Popover>
 
-      {/* Profile Popover */}
       <Popover
         open={Boolean(profileMenuAnchorEl)}
         anchorEl={profileMenuAnchorEl}
@@ -199,10 +188,20 @@ const Header = () => {
               <Person2Outlined /> {res?.user?.name || res?.name}
             </Typography>
             <Divider />
-            <MenuItem onClick={() => navigate("/dashboard/my-account")}>
+            <MenuItem
+              onClick={() => {
+                handleCloseProfileMenu();
+                navigate("/dashboard/my-account");
+              }}
+            >
               Profile
             </MenuItem>
-            <MenuItem onClick={() => navigate("/dashboard/setting")}>
+            <MenuItem
+              onClick={() => {
+                handleCloseProfileMenu();
+                navigate("/dashboard/setting");
+              }}
+            >
               Settings
             </MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>

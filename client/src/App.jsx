@@ -16,8 +16,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useSelector } from "react-redux";
 
 const App = () => {
-  const { user } = useSelector((state) => state?.auth?.user) || "";
-  const isVerified = user?.isVerified;
+  const { isLoggedIn } = useSelector((state) => state?.auth);
+  
   return (
     <Router>
       <Routes>
@@ -27,7 +27,7 @@ const App = () => {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute isVerified={isVerified}>
+            <ProtectedRoute isVerified={isLoggedIn}>
               <AppLayout />
             </ProtectedRoute>
           }
