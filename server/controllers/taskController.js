@@ -50,11 +50,14 @@ exports.getUserTask = async (req, res) => {
   try {
     const { userId } = req.user;
 
+    const sortOrder = req.query.sort === "oldest" ? 1 : -1
+
     const tasks = await Task.find({
       $or: [{ owner: userId }, { assignedTo: { $in: [userId] } }]
     })
       .populate("owner", "name")
-      .populate("assignedTo", "name");
+      .populate("assignedTo", "name")
+      .sort({ createdAt: sortOrder });
 
     if (!tasks.length) {
       return res.NotFound({}, "No tasks found for the user");

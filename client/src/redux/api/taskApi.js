@@ -42,8 +42,9 @@ export const taskApi = createApi({
     }),
    
     getUserTasks: builder.query({
-      query: () => ({
+      query: (sort) => ({
         url: "get-user-task",
+        params: { sort },
         method: "GET",
       }),
     }),
