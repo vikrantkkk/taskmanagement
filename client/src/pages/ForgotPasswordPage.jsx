@@ -62,7 +62,7 @@ const ForgotPasswordPage = () => {
   const handleSendOtp = async (data) => {
     try {
       const response = await fetch(
-       ` ${import.meta.env.VITE_API_BASE_URL}/user/forgot-password`,
+        ` ${import.meta.env.VITE_API_BASE_URL}/user/forgot-password`,
         {
           method: "POST",
           headers: {
@@ -96,7 +96,7 @@ const ForgotPasswordPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials:true,
+          credentials: true,
           body: JSON.stringify({
             otp: data.otp,
             newPassword: data.newPassword,
@@ -153,6 +153,13 @@ const ForgotPasswordPage = () => {
                 variant="contained"
                 color="primary"
                 fullWidth
+                sx={{
+                  backgroundColor: "#673AB7",
+                  "&:hover": {
+                    backgroundColor: "#5e35b1",
+                  },
+                }}
+                F
               >
                 Send OTP
               </Button>
@@ -226,6 +233,12 @@ const ForgotPasswordPage = () => {
                 variant="contained"
                 color="primary"
                 fullWidth
+                sx={{
+                  backgroundColor: "#673AB7",
+                  "&:hover": {
+                    backgroundColor: "#5e35b1",
+                  },
+                }}
               >
                 Reset Password
               </Button>

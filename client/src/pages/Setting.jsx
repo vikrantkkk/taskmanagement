@@ -116,8 +116,8 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="container mx-auto p-6 max-w-4xl">
+    <div className="min-h-screen py-10">
+      <div className="container mx-auto max-w-4xl">
         <h1 className="text-3xl font-bold text-gray-700 mb-8">Settings</h1>
 
      
