@@ -8,7 +8,7 @@ export default defineConfig({
     proxy: {
       // Use environment variable for API base URL
       "/api": {
-        target: process.env.VITE_API_BASE_URL || "https://backend-taskmanagement-atbi.onrender.com",
+        target: process.env.VITE_API_BASE_URL || "https://backend-taskmanagement-atbi.onrender.com/api/v1",
         changeOrigin: true,
         secure: false,
       },
