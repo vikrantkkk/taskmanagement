@@ -70,8 +70,9 @@ exports.registerUser = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      sameSite: process.env.NODE_ENV === "Development" ? "lax" : "none",
+      secure: process.env.NODE_ENV === "Development" ? false : true,
     });
 
     let payload = {
@@ -137,28 +138,27 @@ exports.loginUser = async (req, res) => {
       return res.BadRequest({}, "Email and password are required");
     }
 
-      
     const user = await User.findOne({ email });
     if (!user) {
       return res.NotFound({}, "User not found");
     }
 
-    
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.BadRequest({}, "Invalid password");
     }
 
-
     const otp = generateOtp();
-    const otpExpiresAt = Date.now() + 10 * 60 * 1000; 
+    const otpExpiresAt = Date.now() + 10 * 60 * 1000;
 
-   
     user.otp = otp;
     user.otpExpiresAt = otpExpiresAt;
     await user.save();
+    console.log(
+      "🚀 ~ exports.registerUser= ~ process.env.NODE_ENV:",
+      process.env.NODE_ENV
+    );
 
-    
     const token = jwt.sign(
       { userId: user._id, role: user.role, email },
       process.env.JWT_SECRET,
@@ -167,12 +167,11 @@ exports.loginUser = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, 
-      sameSite: "Strict", 
-      maxAge: 24 * 60 * 60 * 1000, 
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      sameSite: process.env.NODE_ENV === "Development" ? "lax" : "none",
+      secure: process.env.NODE_ENV === "Development" ? false : true,
     });
 
-   
     const payload = {
       email,
       otp,
@@ -206,7 +205,6 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
-
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -216,7 +214,6 @@ exports.getAllUsers = async (req, res) => {
     res.InternalError({}, "Internal server error");
   }
 };
-
 
 exports.updateUserProfile = async (req, res) => {
   try {
@@ -310,20 +307,17 @@ exports.forgotPassword = async (req, res) => {
       return res.NotFound({}, "User not found");
     }
 
-    
     const otp = generateOtp();
     const otpExpiresAt = Date.now() + 10 * 60 * 1000;
-
 
     user.otp = otp;
     user.otpExpiresAt = otpExpiresAt;
     await user.save();
 
-  
     const payload = {
       email: user.email,
       otp,
-      cc: ["vikrantk122896@gmail.com"], 
+      cc: ["vikrantk122896@gmail.com"],
     };
     await mailPayload("forgot_password", payload);
 
@@ -334,7 +328,6 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-
 exports.resetPassword = async (req, res) => {
   try {
     const { otp, newPassword } = req.body;
@@ -343,21 +336,17 @@ exports.resetPassword = async (req, res) => {
       return res.BadRequest({}, "OTP and new password are required");
     }
 
-   
     const user = await User.findOne({ otp });
 
     if (!user) {
       return res.BadRequest({}, "Invalid OTP");
     }
 
-   
     if (user.otpExpiresAt < Date.now()) {
       return res.BadRequest({}, "OTP has expired");
     }
 
-    
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
 
     user.password = hashedPassword;
     user.otp = null;
@@ -380,13 +369,11 @@ exports.deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
-  
     const user = await User.findById(userId);
     if (!user) {
       return res.NotFound({}, "User not found");
     }
 
-  
     await User.findByIdAndDelete(userId);
 
     let payload = {
@@ -401,14 +388,13 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-
 exports.logoutUser = (req, res) => {
   try {
     res.cookie("token", "", {
       httpOnly: true,
-      secure: false, 
-      sameSite: "Strict",
-      expires: new Date(0),
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      sameSite: process.env.NODE_ENV === "Development" ? "lax" : "none",
+      secure: process.env.NODE_ENV === "Development" ? false : true,
     });
 
     return res.Ok({}, "Logged out successfully");
@@ -417,4 +403,3 @@ exports.logoutUser = (req, res) => {
     return res.InternalError({}, "Internal server error");
   }
 };
-

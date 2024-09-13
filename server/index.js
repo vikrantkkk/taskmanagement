@@ -13,10 +13,11 @@ require("./services/cron/cronSheduleReminder");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
 
+const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
+    methods: ["POST", "GET", "DELETE", "PUT"],
     credentials: true,
   },
 });
@@ -25,7 +26,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
+    methods: ["POST", "GET", "DELETE", "PUT"],
     credentials: true,
   })
 );
@@ -58,5 +60,5 @@ io.on("connection", (socket) => {
 app.set("io", io);
 
 server.listen(PORT, () => {
-  console.log(`Server is running on port 🚀 ${PORT}`);
+  console.log(`Server is running on port 🚀 ${PORT} in ${process.env.NODE_ENV} mode`);
 });
