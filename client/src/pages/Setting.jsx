@@ -119,8 +119,6 @@ const SettingsPage = () => {
   return (
     <div className="min-h-screen py-10">
       <div className="container mx-auto max-w-4xl">
-        <h1 className="text-3xl font-bold text-gray-700 mb-8">Settings</h1>
-
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
           <h2 className="text-2xl font-semibold text-gray-600 mb-4">
             Update Password

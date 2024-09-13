@@ -138,10 +138,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <h1 className="md:text-4xl text-xl font-bold text-gray-700 md:mb-8 mb-4 text-center">
-        Task Management Dashboard
-      </h1>
-
       <div className="flex flex-col md:flex-row gap-4  mb-8">
         <DashboardCard title="Total Tasks" value={totalTasks} />
         <DashboardCard title="Completed Tasks" value={completedTasks} />
