@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const BASE_URL = "http://localhost:5000/api/v1/task/";
+
+const BASE_URL = "http://localhost:5000/api/v1/task/"; 
+
 
 export const taskApi = createApi({
   reducerPath: "taskApi",
@@ -15,6 +17,7 @@ export const taskApi = createApi({
     },
   }),
   endpoints: (builder) => ({
+   
     createTask: builder.mutation({
       query: (taskData) => ({
         url: "create-task",
@@ -22,22 +25,22 @@ export const taskApi = createApi({
         body: taskData,
       }),
     }),
-
+    
     updateTask: builder.mutation({
       query: ({ taskId, taskData }) => ({
-        url: `update-task/${taskId}`,
+        url: `update/${taskId}`,
         method: "PUT",
         body: taskData,
       }),
     }),
-
+   
     deleteTask: builder.mutation({
       query: (taskId) => ({
-        url: `delete-task/${taskId}`,
+        url: `delete/${taskId}`,
         method: "DELETE",
       }),
     }),
-
+   
     getUserTasks: builder.query({
       query: (sort) => ({
         url: "get-user-task",
@@ -47,6 +50,7 @@ export const taskApi = createApi({
     }),
   }),
 });
+
 
 export const {
   useCreateTaskMutation,

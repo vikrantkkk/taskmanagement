@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const DashboardCard = ({ title, value }) => {
   return (
-    <div className="relative bg-gradient-to-r from-purple-700 via-purple-500 to-purple-400 shadow-lg rounded-xl p-6 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1rem)]  overflow-hidden text-white">
+    <div className="relative bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 shadow-lg rounded-xl p-6 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1rem)]  overflow-hidden text-white">
       <div className="absolute w-32 h-32 rounded-full bg-white opacity-20 animate-spin-slow top-2/4 left-0 transform -translate-y-2/4"></div>
       <div className="absolute w-56 h-56 rounded-full bg-white opacity-10 animate-spin-slow right-0 bottom-0"></div>
 

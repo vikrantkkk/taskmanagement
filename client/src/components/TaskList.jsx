@@ -26,7 +26,7 @@ import moment from "moment";
 import { useSnackbar } from "notistack";
 import { useGetUserTasksQuery } from "../redux/api/taskApi";
 import { setUserTasks } from "../redux/taskSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
@@ -42,7 +42,6 @@ const TaskList = () => {
     priority: "",
     assignedTo: "",
   });
-  const [sortOption, setSortOption] = useState("newest");
   const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedPriority, setSelectedPriority] = useState("");
@@ -50,21 +49,19 @@ const TaskList = () => {
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
 
-  const { isLoading, refetch } = useGetUserTasksQuery(sortOption);
-  const task = useSelector((state) => state.task);
-  const userTasks = task?.tasks;
+  const { data, isLoading,refetch } = useGetUserTasksQuery();
 
   useEffect(() => {
     const fetchTasks = async () => {
-      if (userTasks) {
-        const res = dispatch(setUserTasks(userTasks));
+      if (data) {
+        const res = await dispatch(setUserTasks(data?.data));
         setTasks(res?.payload);
         setFilteredTasks(res?.payload);
       }
     };
 
     fetchTasks();
-  }, [task, dispatch, tasks]);
+  }, [data, dispatch]);
 
   useEffect(() => {
     if (selectedPriority === "") {
@@ -78,22 +75,6 @@ const TaskList = () => {
       );
     }
   }, [selectedPriority, tasks]);
-
-  useEffect(() => {
-    if (sortOption === "newest") {
-      setFilteredTasks((prevTasks) =>
-        [...prevTasks].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        )
-      );
-    } else if (sortOption === "oldest") {
-      setFilteredTasks((prevTasks) =>
-        [...prevTasks].sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-        )
-      );
-    }
-  }, [sortOption, tasks]);
 
   const getProgress = (status) => {
     switch (status.toLowerCase()) {
@@ -159,13 +140,12 @@ const TaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
-      refetch();
+      refetch()
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task._id === selectedTask._id ? { ...task, ...formData } : task
         )
       );
-      console.log("🚀 ~ handleEditSubmit ~ response:", response);
       setEditDialogOpen(false);
     } catch (error) {
       console.error(error);
@@ -188,7 +168,7 @@ const TaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
-      refetch();
+      refetch()
       setTasks((prevTasks) =>
         prevTasks.filter((task) => task._id !== selectedTask._id)
       );
@@ -205,6 +185,7 @@ const TaskList = () => {
     }
   };
 
+
   const handleMenuClick = (event, task) => {
     setSelectedTask(task);
     setAnchorEl(event.currentTarget);
@@ -216,14 +197,7 @@ const TaskList = () => {
 
   return (
     <div className="">
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "1rem",
-          width: "100%",
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
         <FormControl fullWidth margin="normal" sx={{ width: "10rem" }}>
           <InputLabel id="priority-filter-label">Filter by Priority</InputLabel>
           <Select
@@ -236,19 +210,6 @@ const TaskList = () => {
             <MenuItem value="high">High</MenuItem>
             <MenuItem value="medium">Medium</MenuItem>
             <MenuItem value="low">Low</MenuItem>
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth margin="normal" sx={{ width: "10rem" }}>
-          <InputLabel id="sort-filter-label">Sort by</InputLabel>
-          <Select
-            labelId="sort-filter-label"
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            label="Sort by"
-          >
-            <MenuItem value="newest">Newest</MenuItem>
-            <MenuItem value="oldest">Oldest</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -271,16 +232,52 @@ const TaskList = () => {
                     <MoreVertIcon />
                   </IconButton>
                 </div>
-                <Typography variant="h6">{task.title}</Typography>
 
-                <Box mt={2}>
-                  <Chip
-                    label={task.priority}
-                    color={getPriorityColor(task.priority)}
-                  />
-                  <Chip label={task.status} color="primary" sx={{ ml: 1 }} />
-                </Box>
-                <Typography variant="body2" color="text.primary" mt={2}>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  gutterBottom
+                  fontWeight="bold"
+                  color="text.primary"
+                >
+                  {task.title}
+                </Typography>
+                {task?.description && (
+                  <Typography
+                    sx={{
+                      overflowX: "auto",
+                      scrollbarWidth: "none",
+                      "&::-webkit-scrollbar": {
+                        display: "none",
+                      },
+                    }}
+                    variant="body2"
+                    gutterBottom
+                  >
+                    {task?.description}
+                  </Typography>
+                )}
+
+                <Chip
+                  icon={<PriorityHighIcon />}
+                  label={`Priority: ${task.priority}`}
+                  color={getPriorityColor(task.priority)}
+                  className="my-2"
+                />
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  gutterBottom
+                  fontStyle="italic"
+                >
+                  Status: {task.status}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  className="mt-2"
+                >
                   Owner: {task?.owner?.name}
                 </Typography>
                 {task.assignedTo && task.assignedTo.length > 0 && (
@@ -295,13 +292,9 @@ const TaskList = () => {
                       .join(", ")}
                   </Typography>
                 )}
-                <Typography variant="body2" color="text.secondary">
-                  Due Date:{" "}
-                  {moment(task.dueDate).format("MMMM Do YYYY, h:mm:ss a")}
-                </Typography>
 
                 <Box
-                  mb={2}
+                  my={2}
                   display="flex"
                   alignItems="center"
                   justifyContent="space-between"
@@ -313,6 +306,7 @@ const TaskList = () => {
                     style={{
                       flexGrow: 1,
                       marginRight: "5px",
+                      height: 10,
                       borderRadius: "10px",
                     }}
                   />
@@ -326,24 +320,6 @@ const TaskList = () => {
                   timeout="auto"
                   unmountOnExit
                 >
-                  {task?.description && (
-                    <Typography
-                      sx={{
-                        maxHeight: "5rem",
-                        overflowY: "auto",
-                        wordWrap: "break-word",
-                        scrollbarWidth: "none",
-                        "&::-webkit-scrollbar": {
-                          display: "none",
-                        },
-                      }}
-                      variant="body2"
-                      gutterBottom
-                    >
-                      {task?.description}
-                    </Typography>
-                  )}
-
                   <Box
                     sx={{
                       display: "flex",
@@ -356,6 +332,10 @@ const TaskList = () => {
                     <Typography variant="body2" color="text.secondary">
                       Created On:{" "}
                       {moment(task.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Due Date:{" "}
+                      {moment(task.dueDate).format("MMMM Do YYYY, h:mm:ss a")}
                     </Typography>
                   </Box>
                 </Collapse>
