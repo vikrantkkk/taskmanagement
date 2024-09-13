@@ -12,7 +12,7 @@ const {
   logoutUser,
   getAllUsers,
 } = require("../controllers/userController");
-const { upload } = require("../middlewares/uploadFileMiddleware"); // Make sure this path is correct
+const { upload } = require("../middlewares/uploadFileMiddleware"); 
 const authMiddleware = require("../middlewares/authMiddleware");
 const authorizeRoles = require("../middlewares/authorizeRole");
 

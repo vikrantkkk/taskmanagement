@@ -19,9 +19,9 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
-    isVerified: { type: Boolean, default: false }, // OTP verification status
-    otp: { type: String }, // OTP code
-    otpExpiresAt: { type: Date }, // OTP expiration time
+    isVerified: { type: Boolean, default: false }, 
+    otp: { type: String }, 
+    otpExpiresAt: { type: Date }, 
   },
   { timestamps: true }
 );

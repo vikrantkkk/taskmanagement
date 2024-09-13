@@ -24,16 +24,16 @@ const taskSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    // Modify `assignedTo` to handle multiple assignees
+
     assignedTo: [
       { type: mongoose.Schema.Types.ObjectId, ref: "User" }
     ],
-    // Add a due date for the task
+  
     dueDate: {
       type: Date,
       required: true,
     },
-    // Add fields for overdue and reminders
+  
     isOverdue: {
       type: Boolean,
       default: false,

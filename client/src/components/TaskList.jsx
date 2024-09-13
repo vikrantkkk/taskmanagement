@@ -15,7 +15,6 @@ import {
   InputLabel,
   CircularProgress,
 } from "@mui/material";
-import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -45,11 +44,12 @@ const TaskList = () => {
   const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedPriority, setSelectedPriority] = useState("");
+  const [selectedSortOrder, setSelectedSortOrder] = useState("newest");
   const { enqueueSnackbar } = useSnackbar();
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
 
-  const { data, isLoading,refetch } = useGetUserTasksQuery();
+  const { data, isLoading, refetch } = useGetUserTasksQuery();
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -64,17 +64,25 @@ const TaskList = () => {
   }, [data, dispatch]);
 
   useEffect(() => {
+    let sortedTasks = [...tasks];
+
+    if (selectedSortOrder === "newest") {
+      sortedTasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (selectedSortOrder === "oldest") {
+      sortedTasks.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    }
+
     if (selectedPriority === "") {
-      setFilteredTasks(tasks);
+      setFilteredTasks(sortedTasks);
     } else {
       setFilteredTasks(
-        tasks.filter(
+        sortedTasks.filter(
           (task) =>
             task.priority.toLowerCase() === selectedPriority.toLowerCase()
         )
       );
     }
-  }, [selectedPriority, tasks]);
+  }, [selectedPriority, tasks, selectedSortOrder]);
 
   const getProgress = (status) => {
     switch (status.toLowerCase()) {
@@ -89,16 +97,29 @@ const TaskList = () => {
     }
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority.toLowerCase()) {
-      case "high":
-        return "error";
-      case "medium":
-        return "warning";
-      case "low":
-        return "success";
-      default:
-        return "default";
+  const getColor = (value, type) => {
+    if (type === "priority") {
+      switch (value.toLowerCase()) {
+        case "high":
+          return "error";
+        case "medium":
+          return "warning";
+        case "low":
+          return "success";
+        default:
+          return "default";
+      }
+    } else if (type === "status") {
+      switch (value.toLowerCase()) {
+        case "pending":
+          return "warning";
+        case "inprogress":
+          return "info";
+        case "completed":
+          return "success";
+        default:
+          return "default";
+      }
     }
   };
 
@@ -140,7 +161,7 @@ const TaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
-      refetch()
+      refetch();
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task._id === selectedTask._id ? { ...task, ...formData } : task
@@ -168,7 +189,7 @@ const TaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
-      refetch()
+      refetch();
       setTasks((prevTasks) =>
         prevTasks.filter((task) => task._id !== selectedTask._id)
       );
@@ -185,7 +206,6 @@ const TaskList = () => {
     }
   };
 
-
   const handleMenuClick = (event, task) => {
     setSelectedTask(task);
     setAnchorEl(event.currentTarget);
@@ -197,7 +217,14 @@ const TaskList = () => {
 
   return (
     <div className="">
-      <Box sx={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          width: "100%",
+          alignItems: "center",
+        }}
+      >
         <FormControl fullWidth margin="normal" sx={{ width: "10rem" }}>
           <InputLabel id="priority-filter-label">Filter by Priority</InputLabel>
           <Select
@@ -210,6 +237,19 @@ const TaskList = () => {
             <MenuItem value="high">High</MenuItem>
             <MenuItem value="medium">Medium</MenuItem>
             <MenuItem value="low">Low</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth margin="normal" sx={{ width: "10rem" }}>
+          <InputLabel id="sort-filter-label">Sort by</InputLabel>
+          <Select
+            labelId="sort-filter-label"
+            value={selectedSortOrder}
+            onChange={(e) => setSelectedSortOrder(e.target.value)}
+            label="Sort by"
+          >
+            <MenuItem value="newest">Newest</MenuItem>
+            <MenuItem value="oldest">Oldest</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -242,44 +282,22 @@ const TaskList = () => {
                 >
                   {task.title}
                 </Typography>
-                {task?.description && (
-                  <Typography
-                    sx={{
-                      overflowX: "auto",
-                      scrollbarWidth: "none",
-                      "&::-webkit-scrollbar": {
-                        display: "none",
-                      },
-                    }}
-                    variant="body2"
-                    gutterBottom
-                  >
-                    {task?.description}
-                  </Typography>
-                )}
 
                 <Chip
-                  icon={<PriorityHighIcon />}
                   label={`Priority: ${task.priority}`}
-                  color={getPriorityColor(task.priority)}
-                  className="my-2"
+                  color={getColor(task.priority, "priority")}
                 />
 
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  gutterBottom
-                  fontStyle="italic"
-                >
-                  Status: {task.status}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.primary"
-                  className="mt-2"
-                >
+                <Chip
+                  label={`Status: ${task.status}`}
+                  color={getColor(task.status, "status")}
+                  className="mx-2"
+                />
+
+                <Typography variant="body2" color="text.primary" mt={2}>
                   Owner: {task?.owner?.name}
                 </Typography>
+
                 {task.assignedTo && task.assignedTo.length > 0 && (
                   <Typography
                     variant="body2"
@@ -304,9 +322,7 @@ const TaskList = () => {
                     value={getProgress(task.status)}
                     color={task.status === "completed" ? "success" : "primary"}
                     style={{
-                      flexGrow: 1,
-                      marginRight: "5px",
-                      height: 10,
+                      flex: 1,
                       borderRadius: "10px",
                     }}
                   />
@@ -320,6 +336,23 @@ const TaskList = () => {
                   timeout="auto"
                   unmountOnExit
                 >
+                  {task?.description && (
+                    <Typography
+                      sx={{
+                        maxHeight: "5rem",
+                        overflowY: "auto",
+                        wordWrap: "break-word",
+                        scrollbarWidth: "none",
+                        "&::-webkit-scrollbar": {
+                          display: "none",
+                        },
+                      }}
+                      variant="body2"
+                      gutterBottom
+                    >
+                      {task?.description}
+                    </Typography>
+                  )}
                   <Box
                     sx={{
                       display: "flex",
@@ -355,7 +388,6 @@ const TaskList = () => {
         </div>
       )}
 
-      {/* Edit Task Dialog */}
       {selectedTask && (
         <EditTaskDialog
           open={editDialogOpen}
@@ -366,7 +398,6 @@ const TaskList = () => {
         />
       )}
 
-      {/* Delete Task Dialog */}
       {selectedTask && (
         <DeleteTaskDialog
           open={deleteDialogOpen}
@@ -375,7 +406,6 @@ const TaskList = () => {
         />
       )}
 
-      {/* Menu for Edit and Delete options */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

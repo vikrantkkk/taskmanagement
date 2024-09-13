@@ -34,7 +34,7 @@ const SettingsPage = () => {
     control,
     handleSubmit,
     formState: { errors },
-    reset,  // Use this for resetting the form
+    reset,  
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",

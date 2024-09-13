@@ -26,7 +26,7 @@ const congratulationEmail = ({ email }) => {
         ${emailFooter}
       `,
   };
-};
+}
 
 const otpEmail = ({ email, otp }) => {
   return {
@@ -81,6 +81,25 @@ const changePasswordEmail = ({ email }) => {
   };
 };
 
+
+const forgotPasswordEmail = ({ email, otp }) => {
+  return {
+    subject: "Your Password Reset OTP for TaskPro Manager",
+    html: `
+        ${emailHeader}
+        <div style="padding: 20px;">
+          <p>Hello, ${email}!</p>
+          <p>You requested to reset your password. Please use the following OTP to reset your password:</p>
+          <p><strong>OTP: ${otp}</strong></p>
+          <p>The OTP will expire in 10 minutes.</p>
+          <p>If you did not request this OTP, please ignore this email.</p>
+        </div>
+        ${emailFooter}
+      `,
+  };
+};
+
+
 const passwordResetConfirmationEmail = ({ email }) => {
   return {
     subject: "Password Reset Confirmation - TaskPro Manager",
@@ -130,6 +149,7 @@ module.exports = {
   otpEmail,
   profileUpdateEmail,
   changePasswordEmail,
+  forgotPasswordEmail,
   passwordResetConfirmationEmail,
   accountDeletionEmail,
   taskDueReminderEmail,

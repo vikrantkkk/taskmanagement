@@ -23,6 +23,7 @@ import io from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import TemporaryDrawer from "./TemporaryDrawer";
 import { logout } from "../redux/userSlice";
+import { resetTasks } from "../redux/taskSlice";
 const socket = io("http://localhost:5000");
 
 const Header = () => {
@@ -72,7 +73,7 @@ const Header = () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/logout`);
       localStorage.clear();
-      dispatch(logout());
+      await dispatch(logout());
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);

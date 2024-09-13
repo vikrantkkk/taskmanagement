@@ -17,7 +17,6 @@ const EditTaskDialog = ({
   setFormData,
   handleEditSubmit,
   loading,
-  assignees,
 }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -28,7 +27,11 @@ const EditTaskDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} sx={{height:"90%",margin:"4rem 0 0 0"}}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      sx={{ height: "90%", margin: "4rem 0 0 0" }}
+    >
       <DialogTitle>Edit Task</DialogTitle>
       <DialogContent>
         <TextField
@@ -77,23 +80,6 @@ const EditTaskDialog = ({
           <MenuItem value="low">Low</MenuItem>
           <MenuItem value="medium">Medium</MenuItem>
           <MenuItem value="high">High</MenuItem>
-        </TextField>
-
-        <TextField
-          label="Assigned To"
-          name="assignedTo"
-          fullWidth
-          margin="normal"
-          select
-          value={formData.assignedTo || ""}
-          onChange={handleInputChange}
-          disabled
-        >
-          {assignees?.map((assignee) => (
-            <MenuItem key={assignee._id} value={assignee._id}>
-              {assignee?.name}
-            </MenuItem>
-          )) || null}
         </TextField>
       </DialogContent>
 

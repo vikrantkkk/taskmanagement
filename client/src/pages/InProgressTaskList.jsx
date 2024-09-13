@@ -10,19 +10,26 @@ import {
   Collapse,
   Menu,
   MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  CircularProgress,
 } from "@mui/material";
-import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import axios from "axios";
-import moment from "moment"; 
+import moment from "moment";
 import { useSnackbar } from "notistack";
-import EditTaskDialog from "../components/EditTaskModal";
+import { useGetUserTasksQuery } from "../redux/api/taskApi";
+import { setUserTasks } from "../redux/taskSlice";
+import { useDispatch } from "react-redux";
 import DeleteTaskDialog from "../components/DeleteTaskModal";
+import EditTaskDialog from "../components/EditTaskModal";
 
 const InProgressTaskList = () => {
   const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
   const [expandedTaskId, setExpandedTaskId] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -35,29 +42,49 @@ const InProgressTaskList = () => {
     assignedTo: "",
   });
   const [loading, setLoading] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null); 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedPriority, setSelectedPriority] = useState("");
+  const [selectedSortOrder, setSelectedSortOrder] = useState("newest");
   const { enqueueSnackbar } = useSnackbar();
   const token = localStorage.getItem("token");
+  const dispatch = useDispatch();
+
+  const { data, isLoading, refetch } = useGetUserTasksQuery();
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const { data } = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/task/get-user-task`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+    const fetchCompletedTasks = async () => {
+      if (data) {
+        const res = await dispatch(setUserTasks(data?.data));
+        const filteredCompletedTasks = res?.payload.filter(
+          (task) => task.status.toLowerCase() === "inprogress"
         );
-        setTasks(data.data.filter(task => task.status.toLowerCase() === "inprogress"));
-      } catch (err) {
-        console.error(err);
+        setTasks(filteredCompletedTasks);
       }
     };
 
-    fetchTasks();
-  }, [token]);
+    fetchCompletedTasks();
+  }, [data, dispatch]);
+
+  useEffect(() => {
+    let sortedTasks = [...tasks];
+
+    if (selectedSortOrder === "newest") {
+      sortedTasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (selectedSortOrder === "oldest") {
+      sortedTasks.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    }
+
+    if (selectedPriority === "") {
+      setFilteredTasks(sortedTasks);
+    } else {
+      setFilteredTasks(
+        sortedTasks.filter(
+          (task) =>
+            task.priority.toLowerCase() === selectedPriority.toLowerCase()
+        )
+      );
+    }
+  }, [selectedPriority, tasks, selectedSortOrder]);
 
   const getProgress = (status) => {
     switch (status.toLowerCase()) {
@@ -72,16 +99,29 @@ const InProgressTaskList = () => {
     }
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority.toLowerCase()) {
-      case "high":
-        return "error";
-      case "medium":
-        return "warning";
-      case "low":
-        return "success";
-      default:
-        return "default";
+  const getColor = (value, type) => {
+    if (type === "priority") {
+      switch (value.toLowerCase()) {
+        case "high":
+          return "error";
+        case "medium":
+          return "warning";
+        case "low":
+          return "success";
+        default:
+          return "default";
+      }
+    } else if (type === "status") {
+      switch (value.toLowerCase()) {
+        case "pending":
+          return "warning";
+        case "inprogress":
+          return "info";
+        case "completed":
+          return "success";
+        default:
+          return "default";
+      }
     }
   };
 
@@ -99,13 +139,13 @@ const InProgressTaskList = () => {
       assignedTo: task.assignedTo?._id || "",
     });
     setEditDialogOpen(true);
-    setAnchorEl(null); 
+    setAnchorEl(null);
   };
 
   const openDeleteDialog = (task) => {
     setSelectedTask(task);
     setDeleteDialogOpen(true);
-    setAnchorEl(null); 
+    setAnchorEl(null);
   };
 
   const handleEditSubmit = async () => {
@@ -123,6 +163,7 @@ const InProgressTaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
+      refetch();
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task._id === selectedTask._id ? { ...task, ...formData } : task
@@ -150,6 +191,7 @@ const InProgressTaskList = () => {
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
+      refetch();
       setTasks((prevTasks) =>
         prevTasks.filter((task) => task._id !== selectedTask._id)
       );
@@ -166,7 +208,6 @@ const InProgressTaskList = () => {
     }
   };
 
-  
   const handleMenuClick = (event, task) => {
     setSelectedTask(task);
     setAnchorEl(event.currentTarget);
@@ -177,130 +218,207 @@ const InProgressTaskList = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-      {tasks.map((task) => (
-        <Card
-          key={task._id}
-          className="relative shadow-lg rounded-lg bg-gray-50 flex flex-col"
-        >
-          <CardContent className="flex-1 p-4">
-            <div className="absolute top-2 right-2">
-              <IconButton
-                size="small"
-                onClick={(event) => handleMenuClick(event, task)}
-              >
-                <MoreVertIcon />
-              </IconButton>
-            </div>
-
-            <Typography
-              variant="h5"
-              component="div"
-              gutterBottom
-              fontWeight="bold"
-            >
-              {task.title}
-            </Typography>
-
-            <Chip
-              icon={<PriorityHighIcon />}
-              label={`Priority: ${task.priority}`}
-              color={getPriorityColor(task.priority)}
-              className="my-2 font-bold"
-            />
-
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              gutterBottom
-              fontStyle="italic"
-            >
-              Status: {task.status}
-            </Typography>
-
-            <Box
-              my={2}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <LinearProgress
-                variant="determinate"
-                value={getProgress(task.status)}
-                color={task.status === "complete" ? "success" : "primary"}
-                style={{
-                  flexGrow: 1,
-                  marginRight: "5px",
-                  height: 10,
-                  borderRadius: "10px",
-                }}
-              />
-              <Typography variant="body2">
-                {getProgress(task.status)}%
-              </Typography>
-            </Box>
-
-            <Collapse
-              in={expandedTaskId === task._id}
-              timeout="auto"
-              unmountOnExit
-            >
-              <Typography variant="body2" paragraph>
-                {task.description}
-              </Typography>
-
-              <Typography variant="body2" color="textSecondary">
-                Created On:{" "}
-                {moment(task.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
-              </Typography>
-            </Collapse>
-
-            <IconButton
-              size="small"
-              onClick={() => handleExpandClick(task._id)}
-              className="absolute bottom-2 right-2"
-            >
-              {expandedTaskId === task._id ? (
-                <ExpandLessIcon />
-              ) : (
-                <ExpandMoreIcon />
-              )}
-            </IconButton>
-          </CardContent>
-
-     
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
+    <div className="">
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          width: "100%",
+          alignItems: "center",
+        }}
+      >
+        <FormControl fullWidth margin="normal" sx={{ width: "10rem" }}>
+          <InputLabel id="priority-filter-label">Filter by Priority</InputLabel>
+          <Select
+            labelId="priority-filter-label"
+            value={selectedPriority}
+            onChange={(e) => setSelectedPriority(e.target.value)}
+            label="Filter by Priority"
           >
-            <MenuItem onClick={() => openEditDialog(selectedTask)}>
-              Edit
-            </MenuItem>
-            <MenuItem onClick={() => openDeleteDialog(selectedTask)}>
-              Delete
-            </MenuItem>
-          </Menu>
-        </Card>
-      ))}
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="high">High</MenuItem>
+            <MenuItem value="medium">Medium</MenuItem>
+            <MenuItem value="low">Low</MenuItem>
+          </Select>
+        </FormControl>
 
-      <EditTaskDialog
-        open={editDialogOpen}
-        handleClose={() => setEditDialogOpen(false)}
-        formData={formData}
-        setFormData={setFormData}
-        handleEditSubmit={handleEditSubmit}
-        loading={loading}
-      />
+        <FormControl fullWidth margin="normal" sx={{ width: "10rem" }}>
+          <InputLabel id="sort-filter-label">Sort by</InputLabel>
+          <Select
+            labelId="sort-filter-label"
+            value={selectedSortOrder}
+            onChange={(e) => setSelectedSortOrder(e.target.value)}
+            label="Sort by"
+          >
+            <MenuItem value="newest">Newest</MenuItem>
+            <MenuItem value="oldest">Oldest</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {filteredTasks.map((task) => (
+            <Card
+              key={task._id}
+              className="relative shadow-lg rounded-lg bg-white flex flex-col border border-gray-200"
+            >
+              <CardContent className="flex-1 p-4">
+                <div className="absolute top-2 right-2">
+                  <IconButton
+                    size="small"
+                    onClick={(event) => handleMenuClick(event, task)}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </div>
 
-      <DeleteTaskDialog
-        open={deleteDialogOpen}
-        handleClose={() => setDeleteDialogOpen(false)}
-        selectedTask={selectedTask}
-        handleDelete={handleDelete}
-        loading={loading}
-      />
+                <Typography
+                  variant="h6"
+                  component="div"
+                  gutterBottom
+                  fontWeight="bold"
+                  color="text.primary"
+                >
+                  {task.title}
+                </Typography>
+
+                <Chip
+                  label={`Priority: ${task.priority}`}
+                  color={getColor(task.priority, "priority")}
+                />
+
+                <Chip
+                  label={`Status: ${task.status}`}
+                  color={getColor(task.status, "status")}
+                  className="mx-2"
+                />
+
+                <Typography variant="body2" color="text.primary" mt={2}>
+                  Owner: {task?.owner?.name}
+                </Typography>
+
+                {task.assignedTo && task.assignedTo.length > 0 && (
+                  <Typography
+                    variant="body2"
+                    color="text.primary"
+                    className="mt-2"
+                  >
+                    Assigned To:{" "}
+                    {task.assignedTo
+                      .map((assignee) => assignee.name)
+                      .join(", ")}
+                  </Typography>
+                )}
+
+                <Box
+                  my={2}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <LinearProgress
+                    variant="determinate"
+                    value={getProgress(task.status)}
+                    color={task.status === "completed" ? "success" : "primary"}
+                    style={{
+                      flex: 1,
+                      borderRadius: "10px",
+                    }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {getProgress(task.status)}%
+                  </Typography>
+                </Box>
+
+                <Collapse
+                  in={expandedTaskId === task._id}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  {task?.description && (
+                    <Typography
+                      sx={{
+                        maxHeight: "5rem",
+                        overflowY: "auto",
+                        wordWrap: "break-word",
+                        scrollbarWidth: "none",
+                        "&::-webkit-scrollbar": {
+                          display: "none",
+                        },
+                      }}
+                      variant="body2"
+                      gutterBottom
+                    >
+                      {task?.description}
+                    </Typography>
+                  )}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "5px",
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Created On:{" "}
+                      {moment(task.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Due Date:{" "}
+                      {moment(task.dueDate).format("MMMM Do YYYY, h:mm:ss a")}
+                    </Typography>
+                  </Box>
+                </Collapse>
+              </CardContent>
+
+              <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center">
+                <IconButton onClick={() => handleExpandClick(task._id)}>
+                  {expandedTaskId === task._id ? (
+                    <ExpandLessIcon />
+                  ) : (
+                    <ExpandMoreIcon />
+                  )}
+                </IconButton>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {selectedTask && (
+        <EditTaskDialog
+          open={editDialogOpen}
+          handleClose={() => setEditDialogOpen(false)}
+          handleEditSubmit={handleEditSubmit}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      )}
+
+      {selectedTask && (
+        <DeleteTaskDialog
+          open={deleteDialogOpen}
+          handleClose={() => setDeleteDialogOpen(false)}
+          handleDelete={handleDelete}
+        />
+      )}
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={() => openEditDialog(selectedTask)}>Edit</MenuItem>
+        <MenuItem onClick={() => openDeleteDialog(selectedTask)}>
+          Delete
+        </MenuItem>
+      </Menu>
+      {isLoading && <CircularProgress />}
     </div>
   );
 };

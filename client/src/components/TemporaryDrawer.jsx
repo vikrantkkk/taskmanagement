@@ -2,11 +2,11 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Box, Typography, Drawer, IconButton } from "@mui/material";
 import { Dashboard, ListAlt, HourglassEmpty, CheckCircle, Settings, PendingActions } from "@mui/icons-material";
-import SingleStoreIcon from "../assets/icons/SingleStoreIcon"; 
 import axios from "axios";
 import { logout } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
 import MenuIcon from "@mui/icons-material/Menu";
+import SingleStoreIcon from "../assets/icons/SingleStoreIcon";
 
 const Sidebar = () => {
   const [open, setOpen] = React.useState(false);
@@ -40,7 +40,7 @@ const Sidebar = () => {
       className="flex flex-col h-full bg-gray-900 text-white p-2"
     >
       <Box className="flex items-center gap-2 mb-6 p-4  bg-gray-800 rounded-lg">
-        <SingleStoreIcon className="w-10 h-10" />
+        <SingleStoreIcon className="w-10 h-10 z-50" />
         <Typography variant="h5" className="font-bold text-white">
           TaskPro
         </Typography>

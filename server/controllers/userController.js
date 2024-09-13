@@ -118,7 +118,6 @@ exports.verifyOtp = async (req, res) => {
     await mailPayload("create_account", payload);
 
     user.isVerified = true;
-    // Clear OTP after successful verification
     user.otp = null;
     user.otpExpiresAt = null;
     await user.save();
@@ -138,28 +137,28 @@ exports.loginUser = async (req, res) => {
       return res.BadRequest({}, "Email and password are required");
     }
 
-    // Find user by email
+      
     const user = await User.findOne({ email });
     if (!user) {
       return res.NotFound({}, "User not found");
     }
 
-    // Validate password
+    
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.BadRequest({}, "Invalid password");
     }
 
-    // Generate OTP and expiration time
-    const otp = generateOtp();
-    const otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
 
-    // Save OTP and expiration to the user object
+    const otp = generateOtp();
+    const otpExpiresAt = Date.now() + 10 * 60 * 1000; 
+
+   
     user.otp = otp;
     user.otpExpiresAt = otpExpiresAt;
     await user.save();
 
-    // Generate JWT token
+    
     const token = jwt.sign(
       { userId: user._id, role: user.role, email },
       process.env.JWT_SECRET,
@@ -168,12 +167,12 @@ exports.loginUser = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // Set to true in production when using HTTPS
-      sameSite: "Strict", // Allows cookies to be sent across different ports
-      maxAge: 24 * 60 * 60 * 1000, // Cookie expiration time (1 day)
+      secure: false, 
+      sameSite: "Strict", 
+      maxAge: 24 * 60 * 60 * 1000, 
     });
 
-    // Send OTP to user's email
+   
     const payload = {
       email,
       otp,
@@ -207,7 +206,7 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
-// Get All Users (for the frontend to fetch users and display names)
+
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -225,7 +224,6 @@ exports.updateUserProfile = async (req, res) => {
     const { name, email } = req.body;
 
     const imageLocalPath = req.file?.path;
-    console.log("🚀 ~ exports.updateUserProfile= ~ imageLocalPath:", imageLocalPath)
 
     let imageUrl = null;
 
@@ -312,22 +310,22 @@ exports.forgotPassword = async (req, res) => {
       return res.NotFound({}, "User not found");
     }
 
-    // Generate OTP and expiration time
+    
     const otp = generateOtp();
-    const otpExpiresAt = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+    const otpExpiresAt = Date.now() + 10 * 60 * 1000;
 
-    // Save OTP and expiration to the user object
+
     user.otp = otp;
     user.otpExpiresAt = otpExpiresAt;
     await user.save();
 
-    // Send OTP via email
+  
     const payload = {
       email: user.email,
       otp,
-      cc: ["vikrantk122896@gmail.com"], // Adjust CC as per your needs
+      cc: ["vikrantk122896@gmail.com"], 
     };
-    await mailPayload("otp_verification", payload);
+    await mailPayload("forgot_password", payload);
 
     return res.Ok({}, "OTP sent to your email. Please check your inbox.");
   } catch (error) {
@@ -336,7 +334,7 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// Verify OTP and reset password controller
+
 exports.resetPassword = async (req, res) => {
   try {
     const { otp, newPassword } = req.body;
@@ -345,22 +343,22 @@ exports.resetPassword = async (req, res) => {
       return res.BadRequest({}, "OTP and new password are required");
     }
 
-    // Find the user by OTP
+   
     const user = await User.findOne({ otp });
 
     if (!user) {
       return res.BadRequest({}, "Invalid OTP");
     }
 
-    // Check if OTP has expired
+   
     if (user.otpExpiresAt < Date.now()) {
       return res.BadRequest({}, "OTP has expired");
     }
 
-    // Hash the new password
+    
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update the user's password and clear OTP fields
+
     user.password = hashedPassword;
     user.otp = null;
     user.otpExpiresAt = null;
@@ -382,13 +380,13 @@ exports.deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Check if user exists
+  
     const user = await User.findById(userId);
     if (!user) {
       return res.NotFound({}, "User not found");
     }
 
-    // Delete the user
+  
     await User.findByIdAndDelete(userId);
 
     let payload = {

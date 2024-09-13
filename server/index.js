@@ -12,9 +12,9 @@ const taskRoute = require("./routes/taskRoute");
 require("./services/cron/cronSheduleReminder");
 
 const app = express();
-const server = http.createServer(app); // New
+const server = http.createServer(app);
 const io = new Server(server, {
-  // New
+
   cors: {
     origin: "http://localhost:5173",
     credentials: true,

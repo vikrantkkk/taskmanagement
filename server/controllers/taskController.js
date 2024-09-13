@@ -1,7 +1,7 @@
 const Task = require("../models/taskModel");
 const User = require("../models/userModel");
 
-// Create Task Controller
+
 exports.createTask = async (req, res) => {
   try {
     const { title, description, status, priority, assignedTo, dueDate } = req.body;
@@ -10,7 +10,7 @@ exports.createTask = async (req, res) => {
       return res.BadRequest({ message: "Title is required" });
     }
 
-    // Validate multiple assignees
+  
     if (assignedTo && assignedTo.length > 0) {
       const users = await User.find({ _id: { $in: assignedTo } });
       if (users.length !== assignedTo.length) {
@@ -18,18 +18,18 @@ exports.createTask = async (req, res) => {
       }
     }
 
-    // Create new task
+   
     const newTask = await Task.create({
       title,
       description,
       status,
       priority,
       owner: req.user.userId,
-      assignedTo: assignedTo || [], // Assign empty array if no users assigned
-      dueDate: dueDate || null, // Handle due date
+      assignedTo: assignedTo || [], 
+      dueDate: dueDate || null, 
     });
 
-    // Emit real-time notification for task creation
+    
     const io = req.app.get("io");
     io.emit("newTaskNotification", {
       message: `Task "${newTask.title}" has been created!`,
@@ -45,7 +45,7 @@ exports.createTask = async (req, res) => {
   }
 };
 
-// Get User's Tasks Controller
+
 exports.getUserTask = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -70,7 +70,7 @@ exports.getUserTask = async (req, res) => {
   }
 };
 
-// Update Task Controller
+
 exports.updateTask = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -81,14 +81,14 @@ exports.updateTask = async (req, res) => {
       return res.NotFound({}, "Task not found");
     }
 
-    // Check authorization: only task owner or assigned users can update
+    
     const isOwner = task.owner.toString() === req.user.userId;
     const isAssignedUser = task.assignedTo.includes(req.user.userId);
     if (!isOwner && !isAssignedUser) {
       return res.ForBidden({}, "You are not authorized to update this task");
     }
 
-    // Validate multiple assignees
+    
     if (assignedTo && assignedTo.length > 0) {
       const users = await User.find({ _id: { $in: assignedTo } });
       if (users.length !== assignedTo.length) {
@@ -96,7 +96,7 @@ exports.updateTask = async (req, res) => {
       }
     }
 
-    // Update task
+    
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
       {
@@ -106,7 +106,7 @@ exports.updateTask = async (req, res) => {
           status: status || task.status,
           priority: priority || task.priority,
           assignedTo: assignedTo || task.assignedTo,
-          dueDate: dueDate || task.dueDate, // Update due date
+          dueDate: dueDate || task.dueDate,
         },
       },
       { new: true }
@@ -121,7 +121,7 @@ exports.updateTask = async (req, res) => {
   }
 };
 
-// Delete Task Controller
+
 exports.deleteTask = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -131,9 +131,8 @@ exports.deleteTask = async (req, res) => {
       return res.NotFound({}, "Task not found");
     }
 
-    // Authorization: only owner or admin can delete
     if (task.owner.toString() !== req.user.userId && req.user.role !== "admin") {
-      return res.Forbidden({}, "You are not authorized to delete this task");
+      return res.ForBidden({}, "You are not authorized to delete this task");
     }
 
     await Task.findByIdAndDelete(taskId);

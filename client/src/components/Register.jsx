@@ -67,13 +67,13 @@ const Register = () => {
       const response = await registerMutation(payload).unwrap();
       enqueueSnackbar(response?.message, { variant: "success" });
       localStorage.setItem("userId", response?.data?._id);
-
+      
       dispatch(register(response));
       if (response?.success) {
         navigate("/verifyotp");
       }
     } catch (error) {
-      setError(error.message || "Registration failed");
+      setError(error?.data?.message || "Registration failed");
     }
   };
 

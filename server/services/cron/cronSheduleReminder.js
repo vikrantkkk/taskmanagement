@@ -4,7 +4,7 @@ const Task = require('../../models/taskModel');
 const { mailPayload } = require('../email/emailPayload');
 
 cron.schedule('*/30 * * * *', async () => {
-  // console.log('Running the cron job to check pending tasks...');
+  // console.log('Running the cron job...');
 
   try {
     const tasks = await Task.find({ status: 'pending' }).populate('owner');

@@ -1,6 +1,5 @@
 // authMiddleware.js
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -10,8 +9,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Attach user object to req
-    console.log("🚀 ~ authMiddleware ~ req.user:", req.user.role);
+    req.user = decoded;
     next();
   } catch (error) {
     return res.ForBidden({}, "Invalid token");

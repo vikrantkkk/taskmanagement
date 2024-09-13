@@ -29,7 +29,10 @@ const schema = yup.object().shape({
   dueDate: yup
     .date()
     .required("Due date is required")
-    .min(new Date().toISOString().split('T')[0], "Due date cannot be in the past") 
+    .min(
+      new Date().toISOString().split("T")[0],
+      "Due date cannot be in the past"
+    ),
 });
 
 const CreateTaskDialog = ({ open, handleClose }) => {
@@ -45,6 +48,16 @@ const CreateTaskDialog = ({ open, handleClose }) => {
     setValue,
     reset,
   } = useForm({
+    resolver: yupResolver(schema),
+
+    defaultValues: {
+      title: "",
+      description: "",
+      status: "pending",
+      priority: "medium",
+      dueDate: new Date().toISOString().split("T")[0],
+      assignedTo: [],
+    },
     resolver: yupResolver(schema),
   });
 
@@ -90,9 +103,9 @@ const CreateTaskDialog = ({ open, handleClose }) => {
       reset({
         title: "",
         description: "",
-        status: "",
-        priority: "",
-        dueDate: "",
+        status: "pending",
+        priority: "medium",
+        dueDate: new Date().toISOString().split("T")[0],
         assignedTo: [],
       });
       handleClose();
