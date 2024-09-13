@@ -122,7 +122,10 @@ const ForgotPasswordPage = () => {
       <Box className="absolute  rounded-full bg-white opacity-20 animate-spin-slow top-1/4 left-1/4"></Box>
       <Box className="absolute rounded-full bg-white opacity-10 animate-spin-slow top-2/4 right-1/4"></Box>
 
-      <Box className="absolute top-4 left-4 flex items-center gap-2">
+      <Box
+        onClick={() => navigate("/")}
+        className="absolute top-4 left-4 flex items-center gap-2"
+      >
         <SingleStoreIcon />
         <Typography className="font-bold text-lg sm:text-xl text-white">
           TaskPro
