@@ -9,6 +9,7 @@ import {
 } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
 import SingleStoreIcon from "../assets/icons/SingleStoreIcon";
+import LogoutIcon from '@mui/icons-material/Logout';
 import axios from "axios";
 import { logout } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
@@ -16,13 +17,13 @@ import { useDispatch } from "react-redux";
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/logout`);
       localStorage.clear();
-      dispatch(logout())
+      dispatch(logout());
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
@@ -132,7 +133,7 @@ const Sidebar = () => {
               onClick={handleLogout}
               className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${inactiveClassName}`}
             >
-              <Settings fontSize="small" />
+              <LogoutIcon fontSize="small" />
               <Typography>Logout</Typography>
             </button>
           </li>

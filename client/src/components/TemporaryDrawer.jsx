@@ -7,6 +7,7 @@ import { logout } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
 import MenuIcon from "@mui/icons-material/Menu";
 import SingleStoreIcon from "../assets/icons/SingleStoreIcon";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const Sidebar = () => {
   const [open, setOpen] = React.useState(false);
@@ -118,7 +119,7 @@ const Sidebar = () => {
               onClick={handleLogout}
               className={`flex items-center space-x-3 w-full h-full rounded-lg p-2 ${inactiveClassName}`}
             >
-              <Settings fontSize="small" />
+              <LogoutIcon fontSize="small" />
               <Typography>Logout</Typography>
             </button>
           </li>
