@@ -14,6 +14,7 @@ import {
   FormControl,
   InputLabel,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -158,7 +159,7 @@ const TaskList = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          withCredentials:true
+          withCredentials: true,
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
@@ -187,7 +188,7 @@ const TaskList = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          withCredentials:true
+          withCredentials: true,
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
@@ -339,21 +340,27 @@ const TaskList = () => {
                   unmountOnExit
                 >
                   {task?.description && (
-                    <Typography
-                      sx={{
-                        maxHeight: "5rem",
-                        overflowY: "auto",
-                        wordWrap: "break-word",
-                        scrollbarWidth: "none",
-                        "&::-webkit-scrollbar": {
-                          display: "none",
-                        },
-                      }}
-                      variant="body2"
-                      gutterBottom
+                    <Tooltip
+                      title={task.description} 
+                      placement="top" 
+                      arrow 
                     >
-                      {task?.description}
-                    </Typography>
+                      <Typography
+                        sx={{
+                          maxHeight: "5rem",
+                          overflowY: "auto",
+                          wordWrap: "break-word",
+                          scrollbarWidth: "none",
+                          "&::-webkit-scrollbar": {
+                            display: "none",
+                          },
+                        }}
+                        variant="body2"
+                        gutterBottom
+                      >
+                        {task?.description}
+                      </Typography>
+                    </Tooltip>
                   )}
                   <Box
                     sx={{
