@@ -23,8 +23,9 @@ import io from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import TemporaryDrawer from "./TemporaryDrawer";
 import { logout } from "../redux/userSlice";
-import { resetTasks } from "../redux/taskSlice";
-const socket = io("http://localhost:5000");
+// const socket = io("http://localhost:5000");
+const socket = io("https://backend-taskmanagement-atbi.onrender.com");
+
 
 const Header = () => {
   const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);

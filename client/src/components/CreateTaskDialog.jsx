@@ -74,6 +74,7 @@ const CreateTaskDialog = ({ open, handleClose }) => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
+            withCredentials:true
           }
         );
         setUsers(

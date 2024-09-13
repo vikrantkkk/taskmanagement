@@ -160,6 +160,7 @@ const InProgressTaskList = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials:true
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
@@ -188,6 +189,7 @@ const InProgressTaskList = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials:true
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });

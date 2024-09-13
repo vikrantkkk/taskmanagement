@@ -1,7 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 
-const BASE_URL = "http://localhost:5000/api/v1/task/"; 
+// const BASE_URL = "http://localhost:5000/api/v1/task/"; 
+const BASE_URL = "https://backend-taskmanagement-atbi.onrender.com/api/v1/task/"; 
 
 
 export const taskApi = createApi({
@@ -15,6 +16,7 @@ export const taskApi = createApi({
       }
       return headers;
     },
+    credentials: "include",
   }),
   endpoints: (builder) => ({
    

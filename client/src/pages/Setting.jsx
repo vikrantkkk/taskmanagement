@@ -43,13 +43,14 @@ const SettingsPage = () => {
   const onSubmitPassword = async (data) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/v1/user/change-password",
+        `${import.meta.env.VITE_API_BASE_URL}/user/change-passwor`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials:true,
           body: JSON.stringify({
             oldPassword: data.currentPassword,
             newPassword: data.newPassword,
@@ -84,12 +85,13 @@ const SettingsPage = () => {
     try {
       const userId = localStorage.getItem("userId"); 
       const response = await fetch(
-        `http://localhost:5000/api/v1/user/delete-user/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/user/delete-user/${userId}`,
         {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include",
         }
       );
 

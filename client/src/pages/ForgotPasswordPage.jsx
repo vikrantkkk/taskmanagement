@@ -62,12 +62,13 @@ const ForgotPasswordPage = () => {
   const handleSendOtp = async (data) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/v1/user/forgot-password",
+       ` ${import.meta.env.VITE_API_BASE_URL}/user/forgot-password`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({ email: data.email }),
         }
       );
@@ -89,12 +90,13 @@ const ForgotPasswordPage = () => {
   const handleResetPassword = async (data) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/v1/user/reset-password",
+        `${import.meta.env.VITE_API_BASE_URL}/user/reset-password`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials:true,
           body: JSON.stringify({
             otp: data.otp,
             newPassword: data.newPassword,

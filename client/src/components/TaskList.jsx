@@ -158,6 +158,7 @@ const TaskList = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials:true
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });
@@ -186,6 +187,7 @@ const TaskList = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials:true
         }
       );
       enqueueSnackbar(response?.data?.message, { variant: "success" });

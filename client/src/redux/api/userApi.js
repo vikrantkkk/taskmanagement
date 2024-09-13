@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const BASE_URL = "http://localhost:5000/api/v1/user/";
+// const BASE_URL = "http://localhost:5000/api/v1/user/";
+const BASE_URL = "https://backend-taskmanagement-atbi.onrender.com/api/v1/user/";
 
 export const authApi = createApi({
   reducerPath: "authApi",
@@ -13,6 +14,7 @@ export const authApi = createApi({
       }
       return headers;
     },
+    credentials: "include",
   }),
   endpoints: (builder) => ({
     register: builder.mutation({
