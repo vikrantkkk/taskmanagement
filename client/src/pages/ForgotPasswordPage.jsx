@@ -96,7 +96,7 @@ const ForgotPasswordPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: true,
+          credentials: "include",
           body: JSON.stringify({
             otp: data.otp,
             newPassword: data.newPassword,

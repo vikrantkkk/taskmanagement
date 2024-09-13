@@ -6,8 +6,8 @@ import { TextField, Button, IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
-import { resetTasks } from '../redux/taskSlice';
-import { resetUser } from '../redux/userSlice';
+import { resetTasks } from "../redux/taskSlice";
+import { resetUser } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
 
 const schema = Yup.object().shape({
@@ -27,30 +27,31 @@ const SettingsPage = () => {
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const { enqueueSnackbar } = useSnackbar();
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-    reset,  
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
 
   const onSubmitPassword = async (data) => {
+    console.log("🚀 ~ onSubmitPassword ~ data:", data);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/user/change-passwor`,
+        `${import.meta.env.VITE_API_BASE_URL}/user/change-password`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          credentials:true,
+          credentials: "include",
           body: JSON.stringify({
             oldPassword: data.currentPassword,
             newPassword: data.newPassword,
@@ -83,7 +84,7 @@ const SettingsPage = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      const userId = localStorage.getItem("userId"); 
+      const userId = localStorage.getItem("userId");
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/user/delete-user/${userId}`,
         {
@@ -120,7 +121,6 @@ const SettingsPage = () => {
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-3xl font-bold text-gray-700 mb-8">Settings</h1>
 
-     
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
           <h2 className="text-2xl font-semibold text-gray-600 mb-4">
             Update Password
@@ -143,10 +143,16 @@ const SettingsPage = () => {
                       <InputAdornment position="end">
                         <IconButton
                           aria-label="toggle password visibility"
-                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          onClick={() =>
+                            setShowCurrentPassword(!showCurrentPassword)
+                          }
                           edge="end"
                         >
-                          {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                          {showCurrentPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -201,10 +207,16 @@ const SettingsPage = () => {
                       <InputAdornment position="end">
                         <IconButton
                           aria-label="toggle password visibility"
-                          onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                          onClick={() =>
+                            setShowConfirmNewPassword(!showConfirmNewPassword)
+                          }
                           edge="end"
                         >
-                          {showConfirmNewPassword ? <VisibilityOff /> : <Visibility />}
+                          {showConfirmNewPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -231,7 +243,6 @@ const SettingsPage = () => {
           </form>
         </div>
 
-  
         <div className="bg-white shadow-md rounded-lg p-6">
           <h2 className="text-2xl font-semibold text-red-600 mb-4">
             Permanently Delete Your Account
