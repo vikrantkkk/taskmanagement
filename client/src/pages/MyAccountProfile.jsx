@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useUpdateUserProfileMutation } from "../redux/api/userApi";
-import { updateUserProfile } from "../redux/userSlice";
+import axios from "axios";
 import { useSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import { updateUserProfile } from "../redux/userSlice";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const MyAccountProfile = () => {
   const { user } = useSelector((state) => state.auth);
@@ -14,10 +15,10 @@ const MyAccountProfile = () => {
     user?.profilePic || user?.user?.profilePic || "default-avatar.png"
   );
   const [profilePicFile, setProfilePicFile] = useState(null);
-  const [updateUserProfileMutation] = useUpdateUserProfileMutation();
+  const [uploadProgress, setUploadProgress] = useState(0);
   const dispatch = useDispatch();
+  const token = localStorage.getItem("token");
 
-  
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
     email: Yup.string()
@@ -25,7 +26,7 @@ const MyAccountProfile = () => {
       .required("Email is required"),
   });
 
-
+  // React Hook Form setup
   const {
     register,
     handleSubmit,
@@ -35,8 +36,7 @@ const MyAccountProfile = () => {
     resolver: yupResolver(validationSchema),
   });
 
- 
-  React.useEffect(() => {
+  useEffect(() => {
     setValue("name", user?.name || user?.user?.name || "");
     setValue("email", user?.email || user?.user?.email || "");
   }, [user, setValue]);
@@ -66,9 +66,26 @@ const MyAccountProfile = () => {
         formData.append("images", profilePicFile);
       }
 
-      const response = await updateUserProfileMutation(formData).unwrap();
-      dispatch(updateUserProfile(response));
-      enqueueSnackbar(response?.message, { variant: "success" });
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/user/update-user-profile`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100
+            );
+            setUploadProgress(percentCompleted);
+          },
+          withCredentials: true,
+        }
+      );
+      setUploadProgress(null);
+      dispatch(updateUserProfile(response.data));
+      enqueueSnackbar("Profile updated successfully!", { variant: "success" });
     } catch (error) {
       enqueueSnackbar("Error updating profile", { variant: "error" });
       console.error("Error updating profile:", error);
@@ -102,7 +119,10 @@ const MyAccountProfile = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Name
           </label>
           <input
@@ -113,11 +133,16 @@ const MyAccountProfile = () => {
               errors.name ? "border-red-500" : "border-gray-300"
             } rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
           />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+          {errors.name && (
+            <p className="text-red-500 text-sm">{errors.name.message}</p>
+          )}
         </div>
 
         <div className="mb-6">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
             Email
           </label>
           <input
@@ -128,10 +153,22 @@ const MyAccountProfile = () => {
               errors.email ? "border-red-500" : "border-gray-300"
             } rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
           />
-          {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+          {errors.email && (
+            <p className="text-red-500 text-sm">{errors.email.message}</p>
+          )}
         </div>
 
-        <button type="submit" className="w-full bg-[#673AB7] text-white p-2 rounded-md">
+        {uploadProgress > 0 && (
+          <div className="mb-4 flex items-center">
+            <LinearProgress sx={{width:"100%"}} variant="determinate" value={uploadProgress} />
+            <p>{uploadProgress}%</p>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className="w-full bg-[#673AB7] text-white p-2 rounded-md"
+        >
           Update Profile
         </button>
       </form>
