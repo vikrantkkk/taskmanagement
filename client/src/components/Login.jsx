@@ -30,6 +30,7 @@ const loginSchema = yup.object().shape({
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -60,8 +61,12 @@ const Login = () => {
         navigate("/verifyotp");
       }
     } catch (err) {
-      console.error("Login failed:", err);
-      enqueueSnackbar(err?.data?.message, { variant: "error" });
+      if (err?.originalStatus === 429) {
+        setErrorMessage(err?.data);
+      } else {
+        console.error("Login failed:", err);
+        enqueueSnackbar(err?.data?.message, { variant: "error" });
+      }
     }
   };
 
@@ -124,7 +129,6 @@ const Login = () => {
             disabled={isLoading}
           />
         </Box>
-
         <Button
           type="submit"
           variant="contained"
@@ -140,6 +144,7 @@ const Login = () => {
         >
           Sign In
         </Button>
+        {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
 
         <Box className="text-right mt-2">
           <Button
